@@ -1,31 +1,39 @@
 [main]
+db_prefix = "rommms."
 environ = "local"
 project_root = "blogs"
 
 [database]
 drv_name = "mysql"
 conn_urls = {
-  local_mainDb = {
+  # should not be removed, only change the url.
+  test_db = {
+    partitions = 4,
     conn_max_idle_time = 3000,
     max_open_conns = 10,
     url = "rommms:07261999@unix(/var/run/mysqld/mysqld.sock)/"
   },
+
   local_commentsDb = {
+    partitions = 4,
     conn_max_idle_time = 3000,
     max_open_conns = 10,
     url = "rommms:07261999@unix(/var/run/mysqld/mysqld.sock)/rommms.blogs-comments"
   },
   local_usersDb = {
+    partitions = 4,
     conn_max_idle_time = 3000,
     max_open_conns = 10,
     url = "rommms:07261999@unix(/var/run/mysqld/mysqld.sock)/rommms.blogs-users"
   },
   local_postsDb = {
+    partitions = 4,
     conn_max_idle_time = 3000,
     max_open_conns = 10, 
     url = "rommms:07261999@unix(/var/run/mysqld/mysqld.sock)/rommms.blogs-posts"
   },
   local_reactsDb = {
+    partitions = 4,
     conn_max_idle_time = 3000,
     max_open_conns = 10,
     url = "rommms:07261999@unix(/var/run/mysqld/mysqld.sock)/rommms.blogs-reacts"
