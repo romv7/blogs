@@ -54,17 +54,40 @@ func (s *SQLDataSource) NConnect() (*SQLDataSource, error) {
 	return s.Connect()
 }
 
+
+// To avoid repeatedly calling internal.LoadConfig, it is wise to memoize the number
+// of partitions get from the config to a map. This will reduce the overhead of accessing
+// the number of partitions from the config.
+var N_PART_CACHE_MAP = make(map[string]uint)
+
 // GetTableIdByUnix returns a remainder of a timestamps based on the
 // selected sql data source. For example, [unix ts] % (num_of_partitions) == [0, num_of_partitions-1],
 // this utility function, tells us what table our query will point to
 // based on a unix timestamp. The drawback of this approach is, of course
 // accessing the data.
 //
-// We can solve this issue by including a histories table, which we can use to store info about a query,
+// We can solve the issue by including a histories table, which we can use to store info about a query,
 // and whenever we wanted to access a particular data we will reference this histories
 // table for information about an action.
-func (s *SQLDataSource) GetTableIdByUnix(t uint64) uint {
-	return 0
+func (s *SQLDataSource) GetTableIdByUnix(t int64) int64 {
+	db_name := s.db_name
+
+	// number of partitions the database contains.
+	N := uint(0)
+
+	if _, exists := N_PART_CACHE_MAP[db_name]; !exists {
+		config, _ := internal.LoadConfig()
+		dbconf := config.Database.Conn_urls
+		env := config.Main.Environ
+
+		N = dbconf[env+"_"+db_name+"Db"].Partitions
+		N_PART_CACHE_MAP[db_name] = N
+	} else {
+		N = N_PART_CACHE_MAP[db_name]
+	}
+
+
+	return t%int64(N)
 }
 
 func (s *SQLDataSource) InitWithMockDb(dbName string) {

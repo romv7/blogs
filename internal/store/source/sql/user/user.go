@@ -17,6 +17,7 @@ type UserStoreSql struct {
 }
 
 var initSql = func() {
+	println(123)
 	store.InitSqlDb(db_name, func(db *sql.SQLDataSource) {
 		usersDb = db
 	})
@@ -24,6 +25,9 @@ var initSql = func() {
 
 func (s *UserStoreSql) Save(user *entities.User) (err error) {
 	initSql()
+
+	N := usersDb.GetTableIdByUnix(user.State.CreatedAt.AsTime().Unix())
+	println(N)
 
 	return
 }

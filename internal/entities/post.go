@@ -1,9 +1,9 @@
 package entities
 
 import (
-	"time"
-
 	"github.com/rommms07/blogs/pb"
+	"github.com/google/uuid"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 type Post struct {
@@ -15,11 +15,14 @@ func NewPost(user *User, keywords ...string) (post *Post) {
 	post = &Post{
 		User: user,
 		Post: &pb.Post{
-			User:      user.User,
-			Stage:     pb.Post_S_WIP,
-			Status:    pb.Post_S_DRAFT,
+			UserId:    user.User.Id,
 			Keywords:  keywords,
-			CreatedAt: uint64(time.Now().Unix()),
+			Uuid:      uuid.New().String(),
+			State:	   &pb.PostState {
+				Stage: pb.PostState_S_WIP,
+				Status: pb.PostState_S_DRAFT,
+				CreatedAt: timestamppb.Now(),
+			},	
 		},
 	}
 

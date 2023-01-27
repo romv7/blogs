@@ -1,7 +1,7 @@
 package user
 
 func mock_initSql() {
-
+	
 }
 
 func init() {

@@ -1,9 +1,9 @@
 package entities
 
 import (
-	"time"
-
 	"github.com/rommms07/blogs/pb"
+	"github.com/google/uuid"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 type Comment struct {
@@ -11,15 +11,18 @@ type Comment struct {
 	*pb.Comment
 }
 
-func NewComment(user *User, commentText string, targetId uint64, targetType pb.Comment_TargetType) (comment *Comment) {
+func NewComment(user *User, commentText string, targetUuid string) (comment *Comment) {
 	comment = &Comment{
 		User: user,
 		Comment: &pb.Comment{
-			User:        user.User,
+			UserId:      user.User.Id,
 			CommentText: commentText,
-			TargetType:  targetType,
-			TargetId:    targetId,
-			CreatedAt:   uint64(time.Now().Unix()),
+			TargetUuid:  targetUuid,
+			Uuid: uuid.New().String(),
+			State: &pb.CommentState {
+				CreatedAt: timestamppb.Now(),
+				EditedAt: timestamppb.Now(),
+			},
 		},
 	}
 

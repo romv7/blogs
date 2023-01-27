@@ -4,10 +4,10 @@ import (
 	"testing"
 
 	"github.com/rommms07/blogs/internal"
+	"github.com/google/uuid"
 	"github.com/rommms07/blogs/internal/entities"
 	"github.com/rommms07/blogs/internal/store/source/sql"
 	"github.com/rommms07/blogs/internal/store/source/sql/comment"
-	"github.com/rommms07/blogs/pb"
 )
 
 var (
@@ -31,7 +31,7 @@ func init() {
 func Test_shouldCreateAMockCommentOnBehalfOfAUser(t *testing.T) {
 	// expectsTbl :=
 
-	err := comment_ins.Save(entities.NewComment(mockUser, "The quick brown fox jumps over the lazy dog.", 1, pb.Comment_T_POST))
+	err := comment_ins.Save(entities.NewComment(mockUser, "The quick brown fox jumps over the lazy dog.", uuid.New().String()))
 	if err != nil {
 		t.Errorf(err.Error())
 	}

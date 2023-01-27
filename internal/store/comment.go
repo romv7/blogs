@@ -2,7 +2,6 @@ package store
 
 import (
 	"github.com/rommms07/blogs/internal/entities"
-	"github.com/rommms07/blogs/pb"
 )
 
 type CommentStore struct {
@@ -14,8 +13,8 @@ func NewCommentStore(user *entities.User) (*CommentStore, error) {
 	return &CommentStore{user: user}, nil
 }
 
-func (s *CommentStore) New(commentText string, targetId uint64, targetType pb.Comment_TargetType) *entities.Comment {
-	return entities.NewComment(s.user, commentText, targetId, targetType)
+func (s *CommentStore) New(commentText, targetUuid string) *entities.Comment {
+	return entities.NewComment(s.user, commentText, targetUuid)
 }
 
 func (s *CommentStore) Save(p *entities.Comment) error {

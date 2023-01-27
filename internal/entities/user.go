@@ -1,9 +1,9 @@
 package entities
 
 import (
-	"time"
-
 	"github.com/rommms07/blogs/pb"
+	"github.com/google/uuid"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 type User struct {
@@ -17,15 +17,27 @@ func NewUser(name, fullName, email string) (user *User) {
 			FullName:  fullName,
 			Email:     email,
 			Type:      pb.User_T_NORMAL,
-			CreatedAt: uint64(time.Now().Unix()),
+			Uuid:      uuid.New().String(),
+			State:     &pb.UserState {
+				CreatedAt: timestamppb.Now(),
+				Disabled:  false,
+			},
 		},
 	}
 
 	return
 }
 
-func (u *User) ChangeType(typ pb.User_Type) *User {
+func (u *User) Save() error {
+	return nil		
+}
 
+func (u *User) Delete() error {
+	return nil
+}
+
+func (u *User) ChangeType(typ pb.User_Type) *User {
+	u.Type = typ
 	return u
 }
 

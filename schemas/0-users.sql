@@ -6,6 +6,7 @@ create table if not exists users (
   type smallint,
   picture_url varchar(255) null,
   created_at timestamp,
+  disabled boolean,
 
   primary key(id)
 ) auto_increment = 100;

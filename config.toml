@@ -11,31 +11,31 @@ conn_urls = {
     partitions = 4,
     conn_max_idle_time = 3000,
     max_open_conns = 10,
-    url = "rommms:07261999@unix(/var/run/mysqld/mysqld.sock)/"
+    url = "rom:rom@unix(/var/run/mysqld/mysqld.sock)/"
   },
 
   local_commentsDb = {
     partitions = 4,
     conn_max_idle_time = 3000,
     max_open_conns = 10,
-    url = "rommms:07261999@unix(/var/run/mysqld/mysqld.sock)/rommms.blogs-comments"
+    url = "rom:rom@unix(/var/run/mysqld/mysqld.sock)/rom.blogs-comments"
   },
   local_usersDb = {
     partitions = 4,
     conn_max_idle_time = 3000,
     max_open_conns = 10,
-    url = "rommms:07261999@unix(/var/run/mysqld/mysqld.sock)/rommms.blogs-users"
+    url = "rom:rom@unix(/var/run/mysqld/mysqld.sock)/rom.blogs-users"
   },
   local_postsDb = {
     partitions = 4,
     conn_max_idle_time = 3000,
     max_open_conns = 10, 
-    url = "rommms:07261999@unix(/var/run/mysqld/mysqld.sock)/rommms.blogs-posts"
+    url = "rom:rom@unix(/var/run/mysqld/mysqld.sock)/rom.blogs-posts"
   },
   local_reactsDb = {
     partitions = 4,
     conn_max_idle_time = 3000,
     max_open_conns = 10,
-    url = "rommms:07261999@unix(/var/run/mysqld/mysqld.sock)/rommms.blogs-reacts"
+    url = "rom:rom@unix(/var/run/mysqld/mysqld.sock)/rom.blogs-reacts"
   }
 }
