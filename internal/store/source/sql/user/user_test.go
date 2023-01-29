@@ -7,9 +7,13 @@ import (
 )
 
 func Test_shouldBeAbleToCreateANewMockUser(t *testing.T) {
+	user.InitSql()
+
 	sqlsrc := user.UserStoreSql{}
 	me := entities.NewUser("rommms", "Rom Vales Villanueva", "idream.rommms@gmail.com")
 	sqlsrc.Save(me)
+
+	//sqlsrc.DeleteByUuid(me.Uuid, me.State.CreatedAt.AsTime().Unix())
 }
 
 func Test_mustBeAbleToEditAnExistingMockUser(t *testing.T) {

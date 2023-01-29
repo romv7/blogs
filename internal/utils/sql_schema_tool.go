@@ -111,10 +111,8 @@ func (l *SQLSchemaTool) Load(connName, fname string) error {
 		numParts = 1
 	}
 
-	tableName := strings.ReplaceAll(connName, "Db", "")
-
 	for i := uint(0); i < numParts; i++ {
-		_, err = execQuery(db, strings.ReplaceAll(string(sqlf), tableName, fmt.Sprintf("%s%d", tableName, i)))
+		_, err = execQuery(db, strings.ReplaceAll(string(sqlf), connName, fmt.Sprintf("%s%d", connName, i)))
 		if err != nil {
 			return err
 		}
@@ -171,13 +169,13 @@ func (l *SQLSchemaTool) ReloadAll() (err error) {
 	err = allOpGeneralFunc(func(en os.DirEntry) error {
 		no_ext := removeExt(en.Name())
 
-		err := l.Drop(no_ext+"Db", no_ext)
+		err := l.Drop(no_ext, no_ext)
 		if err != nil {
 			return err
 		}
 
 		name := en.Name()
-		err = l.Load(no_ext+"Db", name)
+		err = l.Load(no_ext, name)
 		if err != nil {
 			return err
 		}
@@ -191,7 +189,7 @@ func (l *SQLSchemaTool) ReloadAll() (err error) {
 func (l *SQLSchemaTool) LoadAll() (err error) {
 	err = allOpGeneralFunc(func(en os.DirEntry) error {
 		name := en.Name()
-		return l.Load(removeExt(name)+"Db", name)
+		return l.Load(removeExt(name), name)
 	}, false)
 
 	return
@@ -200,7 +198,7 @@ func (l *SQLSchemaTool) LoadAll() (err error) {
 func (l *SQLSchemaTool) DropAll() (err error) {
 	err = allOpGeneralFunc(func(en os.DirEntry) error {
 		name := removeExt(en.Name())
-		return l.Drop(name+"Db", name)
+		return l.Drop(name, name)
 	}, true)
 
 	return

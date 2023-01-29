@@ -3,6 +3,7 @@ package sql
 import (
 	"database/sql"
 	"log"
+	"fmt"
 	"strings"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -69,9 +70,7 @@ var N_PART_CACHE_MAP = make(map[string]uint)
 // We can solve the issue by including a histories table, which we can use to store info about a query,
 // and whenever we wanted to access a particular data we will reference this histories
 // table for information about an action.
-func (s *SQLDataSource) GetTableIdByUnix(t int64) int64 {
-	db_name := s.db_name
-
+func (s *SQLDataSource) GetTableIdByUnix(db_name string, t int64) int64 {	
 	// number of partitions the database contains.
 	N := uint(0)
 
@@ -80,14 +79,18 @@ func (s *SQLDataSource) GetTableIdByUnix(t int64) int64 {
 		dbconf := config.Database.Conn_urls
 		env := config.Main.Environ
 
-		N = dbconf[env+"_"+db_name+"Db"].Partitions
+		N = dbconf[env+"_"+db_name].Partitions
 		N_PART_CACHE_MAP[db_name] = N
 	} else {
 		N = N_PART_CACHE_MAP[db_name]
 	}
 
-
 	return t%int64(N)
+}
+
+func (s *SQLDataSource) GetDestTableByUnix(db_name string, t int64) string {
+	N := s.GetTableIdByUnix(db_name, t)
+	return fmt.Sprintf("%s%d", db_name, N)
 }
 
 func (s *SQLDataSource) InitWithMockDb(dbName string) {

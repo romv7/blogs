@@ -15,10 +15,10 @@ func NewPost(user *User, keywords ...string) (post *Post) {
 	post = &Post{
 		User: user,
 		Post: &pb.Post{
-			UserId:    user.User.Id,
-			Keywords:  keywords,
-			Uuid:      uuid.New().String(),
-			State:	   &pb.PostState {
+			Uuid:		uuid.New().String(),
+			UserUuid:	user.Uuid,
+			Keywords:	keywords,
+			State:		&pb.PostState {
 				Stage: pb.PostState_S_WIP,
 				Status: pb.PostState_S_DRAFT,
 				CreatedAt: timestamppb.Now(),

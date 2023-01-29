@@ -15,13 +15,14 @@ func NewComment(user *User, commentText string, targetUuid string) (comment *Com
 	comment = &Comment{
 		User: user,
 		Comment: &pb.Comment{
-			UserId:      user.User.Id,
-			CommentText: commentText,
-			TargetUuid:  targetUuid,
-			Uuid: uuid.New().String(),
-			State: &pb.CommentState {
+			Uuid:		uuid.New().String(),
+			UserUuid:	user.Uuid,
+			CommentText:	commentText,
+			TargetUuid:	targetUuid,
+			State:		&pb.CommentState {
+				Edited:    false,
 				CreatedAt: timestamppb.Now(),
-				EditedAt: timestamppb.Now(),
+				EditedAt:  timestamppb.Now(),
 			},
 		},
 	}

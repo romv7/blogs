@@ -14,7 +14,7 @@ func NewReact(user *User, targetUuid string, typ pb.React_Type) (react *React) {
 	react = &React{
 		User: user,
 		React: &pb.React{
-			UserId:     user.User.Id,
+			UserUuid:   user.Uuid,
 			TargetUuid: targetUuid, 
 			Type:       typ,
 			ReactAt:    timestamppb.Now(),

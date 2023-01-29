@@ -2,10 +2,11 @@ package store_test
 
 import (
 	"testing"
-	"time"
 
+	"google.golang.org/protobuf/types/known/timestamppb"
 	"github.com/rommms07/blogs/internal/entities"
 	"github.com/rommms07/blogs/internal/store"
+	"github.com/google/uuid"
 	"github.com/rommms07/blogs/pb"
 )
 
@@ -13,11 +14,13 @@ var (
 	globalStoreErr error
 	globalFakeUser = &entities.User{
 		User: &pb.User{
-			Id:        0,
-			Name:      "dustybroom0",
+			Uuid:      uuid.New().String(),
+			Name:      "dustybroom0",	
 			FullName:  "George Orwell Jr.",
-			Disabled:  false,
-			CreatedAt: uint64(time.Now().Unix()),
+			State:     &pb.UserState {
+				Disabled: false,
+				CreatedAt: timestamppb.Now(),
+			},
 		},
 	}
 )
@@ -38,7 +41,7 @@ func Test_theTestCommentStoreMustNowBeDefined(t *testing.T) {
 
 func Test_mustInstantiateANewComment(t *testing.T) {
 	message := "You should have created a neat service for that before you had proceeded at making one."
-	comment := commentStore.New(message, 0, pb.Comment_T_POST)
+	comment := commentStore.New(message, globalFakeUser.Uuid)
 
 	if comment.User != globalFakeUser {
 		t.Errorf("[fail] comment.New did not matched the expected creator.")

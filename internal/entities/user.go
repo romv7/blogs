@@ -20,6 +20,7 @@ func NewUser(name, fullName, email string) (user *User) {
 			Uuid:      uuid.New().String(),
 			State:     &pb.UserState {
 				CreatedAt: timestamppb.Now(),
+				UpdatedAt: timestamppb.Now(),
 				Disabled:  false,
 			},
 		},

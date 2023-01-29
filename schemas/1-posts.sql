@@ -1,5 +1,5 @@
 create table if not exists posts (
-  id int UNSIGNED auto_increment,
+  uuid varbinary(36),
   headline_text tinytext unique,
   subject_text varchar(255),
   user_id int UNSIGNED,
@@ -13,8 +13,7 @@ create table if not exists posts (
   archived_at timestamp,
   published_at timestamp,
   created_at timestamp,
+  edited_at timestamp,
 
-  uuid varchar(255) unique,
-  
-  primary key(id)
-) auto_increment = 300;
+  primary key(uuid)
+);
