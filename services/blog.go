@@ -3,13 +3,12 @@ package services
 import (
 	"context"
 
-	"github.com/rommms07/blogs/pb"
+	"github.com/romv7/blogs/pb"
 )
 
 type blogSvcServer struct {
 	pb.UnimplementedBlogServiceServer
 }
-
 
 func (s *blogSvcServer) NewPost(ctx context.Context, req *pb.PostRequest) (res *pb.PostResponse, err error) {
 	return

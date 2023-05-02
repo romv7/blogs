@@ -3,8 +3,8 @@ package store
 import (
 	"errors"
 
-	"github.com/rommms07/blogs/internal/store/source"
-	"github.com/rommms07/blogs/internal/stub"
+	"github.com/romv7/blogs/internal/store/source"
+	"github.com/romv7/blogs/internal/stub"
 )
 
 type UnimplementedStore struct{}
@@ -17,7 +17,11 @@ func (s *UnimplementedStore) Save() error {
 	return stub.UnimplementedMethodCalled()
 }
 
-func (s *UnimplementedStore) Delete() error {
+func (s *UnimplementedStore) DeleteByUuid() error {
+	return stub.UnimplementedMethodCalled()
+}
+
+func (s *UnimplementedStore) DeleteById() error {
 	return stub.UnimplementedMethodCalled()
 }
 

@@ -3,9 +3,9 @@ package store_test
 import (
 	"testing"
 
-	"github.com/rommms07/blogs/internal/entities"
-	"github.com/rommms07/blogs/internal/store"
-	"github.com/rommms07/blogs/pb"
+	"github.com/romv7/blogs/internal/entities"
+	"github.com/romv7/blogs/internal/store"
+	"github.com/romv7/blogs/pb"
 )
 
 var (
@@ -23,14 +23,14 @@ func Test_theTestUserStoreMustNowBeDefined(t *testing.T) {
 }
 
 func Test_mustInstantiateANewUserEntity(t *testing.T) {
-	me := userStore.New("rommms07", "Rom Vales Villanueva", "romdevmod@gmail.com")
+	me := userStore.New("romv7", "Rom Vales Villanueva", "romdevmod@gmail.com")
 	if me == nil {
 		t.Errorf("[fail] userStore.New was not able to create a new user entity.")
 	}
 
 	expect := &entities.User{
 		User: &pb.User{
-			Name:     "rommms07",
+			Name:     "romv7",
 			FullName: "Rom Vales Villanueva",
 			Email:    "romdevmod@gmail.com",
 		},

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/rommms07/blogs/internal/store"
+	"github.com/romv7/blogs/internal/store"
 )
 
 type mockDataSource struct {
@@ -18,10 +18,11 @@ func (s *mockDataSource) Connect() (*mockDataSource, error) {
 func Test_shallowCheckUnimplementedStubs(t *testing.T) {
 	unimp := &store.UnimplementedStore{}
 	expectedCases := map[string]func() error{
-		"UnimplementedNew":    unimp.New,
-		"UnimplementedSave":   unimp.Save,
-		"UnimplementedDelete": unimp.Delete,
-		"UnimplementedRead":   unimp.Read,
+		"UnimplementedNew":          unimp.New,
+		"UnimplementedSave":         unimp.Save,
+		"UnimplementedDeleteByUuid": unimp.DeleteByUuid,
+		"UnimplementedDeleteById":   unimp.DeleteById,
+		"UnimplementedRead":         unimp.Read,
 	}
 
 	for caseName, unimpMethod := range expectedCases {

@@ -4,7 +4,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/rommms07/blogs/internal"
+	"github.com/romv7/blogs/internal"
 )
 
 var (

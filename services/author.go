@@ -3,7 +3,7 @@ package services
 import (
 	"context"
 
-	"github.com/rommms07/blogs/pb"
+	"github.com/romv7/blogs/pb"
 )
 
 type authorSvcServer struct {

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/rommms07/blogs/internal/store/source/sql"
+	"github.com/romv7/blogs/internal/store/source/sql"
 
 	dsql "database/sql"
 )

@@ -7,8 +7,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/rommms07/blogs/internal"
-	"github.com/rommms07/blogs/internal/utils"
+	"github.com/romv7/blogs/internal"
+	"github.com/romv7/blogs/internal/utils"
 )
 
 const (

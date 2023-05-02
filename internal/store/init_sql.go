@@ -3,11 +3,11 @@ package store
 import (
 	"log"
 
-	"github.com/rommms07/blogs/internal/store/source/sql"
+	"github.com/romv7/blogs/internal/store/source/sql"
 )
 
-var InitSqlDb = func(connUrlName string, initCb func(*sql.SQLDataSource)) {
-	ds, err := OpenSqlDb(connUrlName, nil)
+var InitSqlDb = func(dbName string, initCb func(*sql.SQLDataSource)) {
+	ds, err := OpenSqlDb(dbName, nil)
 	if err != nil {
 		log.Fatalf(err.Error())
 	}

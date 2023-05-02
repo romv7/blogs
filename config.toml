@@ -1,7 +1,6 @@
 [main]
 db_prefix = "rom."
 environ = "local"
-project_root = "blogs"
 
 [database]
 drv_name = "mysql"
@@ -16,24 +15,18 @@ conn_urls = {
     partitions = 4,
     conn_max_idle_time = 3000,
     max_open_conns = 10,
-    url = "rom:rom@unix(/var/run/mysqld/mysqld.sock)/rom.blogs-users"
+    url = "rom:rom@unix(/var/run/mysqld/mysqld.sock)/rom.blogs-users?parseTime=true"
   },
   local_posts = {
     partitions = 4,
     conn_max_idle_time = 3000,
     max_open_conns = 10, 
-    url = "rom:rom@unix(/var/run/mysqld/mysqld.sock)/rom.blogs-posts"
+    url = "rom:rom@unix(/var/run/mysqld/mysqld.sock)/rom.blogs-posts?parseTime=true"
   },
-  local_reacts = {
+  local_uuidIndexes = {
     partitions = 4,
     conn_max_idle_time = 3000,
-    max_open_conns = 10,
-    url = "rom:rom@unix(/var/run/mysqld/mysqld.sock)/rom.blogs-reacts"
-  },
-  local_uuidindex = {
-    partitions = 1,
-    conn_max_idle_time = 3000,
     max_open_conns = 32,
-    url = "rom:rom@unix(/var/run/mysqld/mysqld.sock)/rom.blogs-uuidindex"
+    url = "rom:rom@unix(/var/run/mysqld/mysqld.sock)/rom.blogs-uuidIndexes?parseTime=true"
   }
 }

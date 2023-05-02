@@ -1,7 +1,7 @@
 package store
 
 import (
-	"github.com/rommms07/blogs/internal/entities"
+	"github.com/romv7/blogs/internal/entities"
 )
 
 type PostStore struct {
@@ -14,7 +14,7 @@ func NewPostStore(user *entities.User) *PostStore {
 }
 
 func (s *PostStore) New() *entities.Post {
-	return entities.NewPost(s.user)
+	return entities.NewPost(s.user, "", "")
 }
 
 func (s *PostStore) Read(query string) {

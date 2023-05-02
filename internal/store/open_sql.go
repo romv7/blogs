@@ -1,15 +1,18 @@
 package store
 
 import (
+	"errors"
 	"log"
 
-	"github.com/rommms07/blogs/internal"
-	"github.com/rommms07/blogs/internal/store/source/sql"
+	"github.com/go-sql-driver/mysql"
+	"github.com/romv7/blogs/internal"
+	"github.com/romv7/blogs/internal/store/source/sql"
 )
 
 var ds_err error
+var ErrNoConnUrlFound = errors.New("no connection info found.")
 
-func OpenSqlDb(connUrlName string, initCb func(*DataSource[sql.SQLDataSource])) (*DataSource[sql.SQLDataSource], error) {
+func OpenSqlDb(dbName string, initCb func(*DataSource[sql.SQLDataSource])) (*DataSource[sql.SQLDataSource], error) {
 	config, err := internal.LoadConfig()
 	if err != nil {
 		return nil, err
@@ -18,20 +21,11 @@ func OpenSqlDb(connUrlName string, initCb func(*DataSource[sql.SQLDataSource])) 
 	drvName := config.Database.Drv_name
 
 	return NewDataSource(func(ds *DataSource[sql.SQLDataSource]) {
-		var prefix string
+		prefix := config.Main.Environ + "_"
 
-		if config.IsDev() {
-			prefix = config.Main.Environ + "_"
-		}
-
-		connInfo, exists := config.Database.Conn_urls[prefix+connUrlName]
-		if !exists && config.Main.Environ != "test" {
-			log.Fatalf("error: connection info \"%s\" does not exists..", config.Main.Db_prefix+prefix+connUrlName)
-		} else if config.Main.Environ == "test" {
-			testDb := config.Database.Conn_urls["test_db"]
-			connInfo.Url = testDb.Url + config.Main.Db_prefix + prefix + connUrlName
-			connInfo.ConnMaxIdleTime = testDb.ConnMaxIdleTime
-			connInfo.MaxOpenConns = testDb.MaxOpenConns
+		connInfo, exists := config.Database.Conn_urls[prefix+dbName]
+		if !exists {
+			log.Fatalf("error: connection info \"%s\" does not exists..", config.Main.Db_prefix+dbName)
 		}
 
 		ds.Source = sql.NewSQLDataSource(drvName, connInfo.Url)
@@ -50,6 +44,34 @@ func OpenSqlDb(connUrlName string, initCb func(*DataSource[sql.SQLDataSource])) 
 			initCb(ds)
 		}
 	})
+}
+
+func GetDBConnConfig(dbName string) (out *mysql.Config, err error) {
+	config, err := internal.LoadConfig()
+	if err != nil {
+		return nil, err
+	}
+
+	connInfo, exists := config.Database.Conn_urls[config.Main.Environ+"_"+dbName]
+	if !exists {
+		return nil, ErrNoConnUrlFound
+	}
+
+	return mysql.ParseDSN(connInfo.Url)
+}
+
+func GetPartCount(dbName string) uint {
+	config, err := internal.LoadConfig()
+	if err != nil {
+		log.Fatalf(err.Error())
+	}
+
+	connInfo, exists := config.Database.Conn_urls[config.Main.Environ+"_"+dbName]
+	if !exists {
+		log.Fatalf(ErrNoConnUrlFound.Error())
+	}
+
+	return connInfo.Partitions
 }
 
 func OpenSqlDbError() error {

@@ -6,9 +6,9 @@ import (
 	"os"
 	"strings"
 
-	"github.com/rommms07/blogs/internal"
-	"github.com/rommms07/blogs/internal/store"
-	"github.com/rommms07/blogs/internal/store/source/sql"
+	"github.com/romv7/blogs/internal"
+	"github.com/romv7/blogs/internal/store"
+	"github.com/romv7/blogs/internal/store/source/sql"
 
 	dsql "database/sql"
 )

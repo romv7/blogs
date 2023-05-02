@@ -1,19 +1,21 @@
 create table if not exists posts (
+  id bigint UNSIGNED,
+  user_id int UNSIGNED,
+  
   uuid varbinary(36),
   headline_text tinytext unique,
-  subject_text varchar(255),
-  user_id int UNSIGNED,
-  keywords json null,
-  content_url varchar(255),
-  multimedia_url json null,
+  summary_text varchar(255),
+  tags varchar(255) null,
   stage smallint UNSIGNED,
   status smallint UNSIGNED,
   
-  revised_at timestamp,
-  archived_at timestamp,
-  published_at timestamp,
+  revised_at timestamp NULL,
+  archived_at timestamp NULL,
+  published_at timestamp NULL,
   created_at timestamp,
-  edited_at timestamp,
 
-  primary key(uuid)
+  original_id bigint UNSIGNED NULL,
+
+  primary key(id),
+  unique key(uuid)
 );

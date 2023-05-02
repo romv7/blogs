@@ -1,8 +1,9 @@
 package entities
 
 import (
-	"github.com/rommms07/blogs/pb"
 	"github.com/google/uuid"
+	"github.com/romv7/blogs/internal/utils/rand"
+	"github.com/romv7/blogs/pb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -11,16 +12,20 @@ type User struct {
 }
 
 func NewUser(name, fullName, email string) (user *User) {
+	now := timestamppb.Now()
+	N, _ := rand.Rand()
+
 	user = &User{
 		User: &pb.User{
-			Name:      name,
-			FullName:  fullName,
-			Email:     email,
-			Type:      pb.User_T_NORMAL,
-			Uuid:      uuid.New().String(),
-			State:     &pb.UserState {
-				CreatedAt: timestamppb.Now(),
-				UpdatedAt: timestamppb.Now(),
+			Id:       uint32(now.AsTime().Unix()) + uint32(N),
+			Name:     name,
+			FullName: fullName,
+			Email:    email,
+			Type:     pb.User_T_NORMAL,
+			Uuid:     uuid.New().String(),
+			State: &pb.UserState{
+				CreatedAt: now,
+				UpdatedAt: now,
 				Disabled:  false,
 			},
 		},
@@ -29,12 +34,8 @@ func NewUser(name, fullName, email string) (user *User) {
 	return
 }
 
-func (u *User) Save() error {
-	return nil		
-}
-
-func (u *User) Delete() error {
-	return nil
+func (u *User) UniqueKey() string {
+	return u.Email
 }
 
 func (u *User) ChangeType(typ pb.User_Type) *User {

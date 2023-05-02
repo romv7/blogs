@@ -1,7 +1,7 @@
 package store
 
 import (
-	"github.com/rommms07/blogs/internal/entities"
+	"github.com/romv7/blogs/internal/entities"
 )
 
 type UserStore struct {

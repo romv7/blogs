@@ -3,7 +3,7 @@ package sql_test
 import (
 	"testing"
 
-	"github.com/rommms07/blogs/internal/store/source/sql"
+	"github.com/romv7/blogs/internal/store/source/sql"
 )
 
 func Test_willReturnAnErrorWhenOffline(t *testing.T) {

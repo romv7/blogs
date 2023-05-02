@@ -2,12 +2,12 @@ package sql
 
 import (
 	"database/sql"
-	"log"
 	"fmt"
+	"log"
 	"strings"
 
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/rommms07/blogs/internal"
+	"github.com/romv7/blogs/internal"
 )
 
 var opened map[string]*sql.DB
@@ -55,6 +55,10 @@ func (s *SQLDataSource) NConnect() (*SQLDataSource, error) {
 	return s.Connect()
 }
 
+func (s *SQLDataSource) GetDestTableByUnix(db_name string, t int64) string {
+	N := s.GetTableIdByUnix(db_name, t)
+	return fmt.Sprintf("%s%d", db_name, N)
+}
 
 // To avoid repeatedly calling internal.LoadConfig, it is wise to memoize the number
 // of partitions get from the config to a map. This will reduce the overhead of accessing
@@ -70,7 +74,7 @@ var N_PART_CACHE_MAP = make(map[string]uint)
 // We can solve the issue by including a histories table, which we can use to store info about a query,
 // and whenever we wanted to access a particular data we will reference this histories
 // table for information about an action.
-func (s *SQLDataSource) GetTableIdByUnix(db_name string, t int64) int64 {	
+func (s *SQLDataSource) GetTableIdByUnix(db_name string, t int64) int64 {
 	// number of partitions the database contains.
 	N := uint(0)
 
@@ -85,12 +89,7 @@ func (s *SQLDataSource) GetTableIdByUnix(db_name string, t int64) int64 {
 		N = N_PART_CACHE_MAP[db_name]
 	}
 
-	return t%int64(N)
-}
-
-func (s *SQLDataSource) GetDestTableByUnix(db_name string, t int64) string {
-	N := s.GetTableIdByUnix(db_name, t)
-	return fmt.Sprintf("%s%d", db_name, N)
+	return t % int64(N)
 }
 
 func (s *SQLDataSource) InitWithMockDb(dbName string) {

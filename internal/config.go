@@ -2,7 +2,6 @@ package internal
 
 import (
 	"fmt"
-	"go/build"
 	"os"
 	"time"
 
@@ -15,7 +14,7 @@ var (
 
 type ConfigSchema struct {
 	Main struct {
-		Db_prefix, Environ, Project_root string
+		Db_prefix, Environ string
 	}
 
 	Database struct {
@@ -48,16 +47,15 @@ func (c *ConfigSchema) Setenv(env string) {
 }
 
 func RootDir() string {
-	return build.Default.GOPATH + "/src"
+	return os.Getenv("ROOT_DIR")
 }
 
 func GetSchemaRootDir() string {
-	config, _ := LoadConfig()
-	return RootDir() + "/" + config.Main.Project_root + "/schemas"
+	return RootDir() + "/schemas"
 }
 
 func GetConfigPath() string {
-	return fmt.Sprintf("%s/src/blogs/config.toml", build.Default.GOPATH)
+	return fmt.Sprintf("%s/config.toml", RootDir())
 }
 
 func LoadConfig() (schema *ConfigSchema, err error) {
@@ -66,7 +64,7 @@ func LoadConfig() (schema *ConfigSchema, err error) {
 	}
 
 	schema = &ConfigSchema{
-		Main: struct{ Db_prefix, Environ, Project_root string }{},
+		Main: struct{ Db_prefix, Environ string }{},
 		Database: struct {
 			Drv_name  string
 			Conn_urls ConfigSchemaConnUrls

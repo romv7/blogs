@@ -3,7 +3,7 @@ package store_test
 import (
 	"testing"
 
-	"github.com/rommms07/blogs/internal/store"
+	"github.com/romv7/blogs/internal/store"
 )
 
 var (
