@@ -1,9 +1,7 @@
 package main
 
-import "github.com/romv7/blogs/internal/utils"
+import "github.com/romv7/blogs/internal/store/sql"
 
 func main() {
-	if err := utils.NewSQLSchemaTool().ReloadAll(); err != nil {
-		println(err.Error())
-	}
+	sql.Migrate()
 }
