@@ -180,7 +180,7 @@ func (s *CommentStore) TargetCommentProtoTree(t_uuid string) (out []*pb.Comment)
 			c := res.Proto()
 
 			if u, err := ustore.GetById(res.UserId); err != nil {
-				// @TODO
+				// @TODO (Handle comment that has no owner)
 			} else {
 				c.User = u.Proto()
 			}

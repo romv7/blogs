@@ -2,6 +2,7 @@ package storeTest
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"testing"
 	"time"
@@ -123,6 +124,11 @@ func TestCommentStore_SqlStore(t *testing.T) {
 	cstore.Save(cioran_reply)
 	defer cstore.Delete(cioran_reply)
 
-	p, _ := json.Marshal(post.Proto())
-	ioutil.WriteFile("/tmp/cioran-blog.json", p, 0644)
+	P, err := pstore.GetByUuid(post.Proto().Uuid)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	byt, _ := json.Marshal(P.Proto())
+	ioutil.WriteFile("/tmp/post.json", byt, 0644)
 }

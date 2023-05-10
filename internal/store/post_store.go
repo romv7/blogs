@@ -24,12 +24,14 @@ func (p *Post) Proto() *pb.Post {
 		pout := p.sqlModel.Proto()
 
 		if u, err := ustore.GetById(p.sqlModel.UserId); errors.Is(err, gorm.ErrRecordNotFound) {
-			// @TODO
+			// @TODO (Handle post that has no owner)
 		} else {
 			pout.User = u.Proto()
 		}
 
 		pout.Comments = cstore.TargetCommentProtoTree(pout.Uuid)
+
+		// @TODO (Add an edit history)
 
 		return pout
 	default:
