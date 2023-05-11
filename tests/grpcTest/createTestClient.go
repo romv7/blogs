@@ -1,6 +1,8 @@
 package grpcTest
 
 import (
+	"log"
+
 	"github.com/romv7/blogs/internal/pb"
 	"google.golang.org/grpc"
 )
@@ -20,7 +22,7 @@ const (
 func dialGrpcClientConn() *grpc.ClientConn {
 	conn, err := grpc.Dial(ListenerAddr, grpc.WithInsecure())
 	if err != nil {
-		panic(err)
+		log.Panic(err)
 	}
 
 	return conn

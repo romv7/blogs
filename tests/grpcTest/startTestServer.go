@@ -1,6 +1,7 @@
 package grpcTest
 
 import (
+	"log"
 	"net"
 
 	"google.golang.org/grpc"
@@ -19,7 +20,7 @@ func startTestServer(service interface{}) {
 
 	lis, err = net.Listen("tcp", ListenerAddr)
 	if err != nil {
-		panic(err)
+		log.Panic(err)
 	}
 
 	grpcServer := grpc.NewServer()

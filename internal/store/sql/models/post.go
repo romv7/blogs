@@ -1,6 +1,7 @@
 package models
 
 import (
+	"log"
 	"time"
 
 	"github.com/romv7/blogs/internal/pb"
@@ -26,12 +27,12 @@ type Post struct {
 func NewPost(p *pb.Post) (out *Post) {
 	tags_b, err := proto.Marshal(p.Tags)
 	if err != nil {
-		panic(err)
+		log.Panic(err)
 	}
 
 	reacts_b, err := proto.Marshal(p.State.Reacts)
 	if err != nil {
-		panic(err)
+		log.Panic(err)
 	}
 
 	out = &Post{
@@ -74,11 +75,11 @@ func (p *Post) Proto() (out *pb.Post) {
 	reacts := new(pb.Reacts)
 
 	if err := proto.Unmarshal(p.Tags, tags); err != nil {
-		panic(err)
+		log.Panic(err)
 	}
 
 	if err := proto.Unmarshal(p.Reacts, reacts); err != nil {
-		panic(err)
+		log.Panic(err)
 	}
 
 	out.Tags = tags

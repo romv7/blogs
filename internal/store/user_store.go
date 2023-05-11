@@ -2,6 +2,7 @@ package store
 
 import (
 	"errors"
+	"log"
 
 	"github.com/romv7/blogs/internal/pb"
 	sqlStore "github.com/romv7/blogs/internal/store/sql"
@@ -21,9 +22,10 @@ func (u *User) Proto() *pb.User {
 	case SqlStore:
 		return u.sqlModel.Proto()
 	default:
-		panic(ErrInvalidStore)
+		log.Panic(ErrInvalidStore)
 	}
 
+	return nil
 }
 
 type UserStore struct {
@@ -39,7 +41,7 @@ func (s *UserStore) GetMainStore() (S any) {
 	case SqlStore:
 		S = sqlStore.Store()
 	default:
-		panic(ErrInvalidStore)
+		log.Panic(ErrInvalidStore)
 	}
 
 	return
@@ -53,7 +55,7 @@ func (s *UserStore) NewUser(u *pb.User) (out *User) {
 		out.t = SqlStore
 		out.sqlModel = sqlModels.NewUser(u)
 	default:
-		panic(ErrInvalidStore)
+		log.Panic(ErrInvalidStore)
 	}
 
 	return
@@ -68,7 +70,7 @@ func (s *UserStore) Save(u *User) (err error) {
 
 		err = res.Error
 	default:
-		panic(ErrInvalidStore)
+		log.Panic(ErrInvalidStore)
 	}
 
 	return
@@ -86,7 +88,7 @@ func (s *UserStore) Delete(u *User) (err error) {
 
 		u = nil
 	default:
-		panic(ErrInvalidStore)
+		log.Panic(ErrInvalidStore)
 	}
 
 	return
@@ -106,7 +108,7 @@ func (s *UserStore) GetById(id uint32) (out *User, err error) {
 		}
 
 	default:
-		panic(ErrInvalidStore)
+		log.Panic(ErrInvalidStore)
 	}
 
 	return
@@ -126,7 +128,7 @@ func (s *UserStore) GetByUuid(uuid string) (out *User, err error) {
 		}
 
 	default:
-		panic(ErrInvalidStore)
+		log.Panic(ErrInvalidStore)
 	}
 
 	return

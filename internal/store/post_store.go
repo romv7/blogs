@@ -2,6 +2,7 @@ package store
 
 import (
 	"errors"
+	"log"
 
 	"github.com/romv7/blogs/internal/pb"
 	sqlStore "github.com/romv7/blogs/internal/store/sql"
@@ -35,9 +36,10 @@ func (p *Post) Proto() *pb.Post {
 
 		return pout
 	default:
-		panic(ErrInvalidStore)
+		log.Panic(ErrInvalidStore)
 	}
 
+	return nil
 }
 
 type PostStore struct {
@@ -58,7 +60,7 @@ func (s *PostStore) NewPost(u *pb.User, p *pb.Post) (out *Post) {
 		out.t = s.t
 		out.sqlModel = sqlModels.NewPost(p)
 	default:
-		panic(ErrInvalidStore)
+		log.Panic(ErrInvalidStore)
 	}
 
 	return
@@ -71,7 +73,7 @@ func (s *PostStore) Save(p *Post) (err error) {
 		res := db.Save(p.sqlModel)
 		err = res.Error
 	default:
-		panic(ErrInvalidStore)
+		log.Panic(ErrInvalidStore)
 	}
 
 	return
@@ -89,7 +91,7 @@ func (s *PostStore) Delete(p *Post) (err error) {
 
 		p = nil
 	default:
-		panic(ErrInvalidStore)
+		log.Panic(ErrInvalidStore)
 	}
 
 	return
@@ -107,7 +109,7 @@ func (s *PostStore) GetById(id uint32) (out *Post, err error) {
 			return nil, res.Error
 		}
 	default:
-		panic(ErrInvalidStore)
+		log.Panic(ErrInvalidStore)
 	}
 
 	return
@@ -125,7 +127,7 @@ func (s *PostStore) GetByUuid(uuid string) (out *Post, err error) {
 			return nil, res.Error
 		}
 	default:
-		panic(ErrInvalidStore)
+		log.Panic(ErrInvalidStore)
 	}
 
 	return

@@ -1,6 +1,7 @@
 package models
 
 import (
+	"log"
 	"time"
 
 	"github.com/romv7/blogs/internal/pb"
@@ -64,11 +65,11 @@ func (c *Comment) Proto() (out *pb.Comment) {
 	commentText := new(pb.CommentText)
 
 	if err := proto.Unmarshal(c.Reacts, reacts); err != nil {
-		panic(err)
+		log.Panic(err)
 	}
 
 	if err := proto.Unmarshal(c.CommentText, commentText); err != nil {
-		panic(err)
+		log.Panic(err)
 	}
 
 	out.State.Reacts = reacts

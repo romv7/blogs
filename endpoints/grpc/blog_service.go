@@ -32,6 +32,10 @@ func (svc *B) NewBlogPost(ctx context.Context, params *pb.BlogService_NewBlogPos
 	out.HeadlineText = params.HeadlineText
 	out.SummaryText = params.SummaryText
 	out.Tags = &pb.Tags{Data: params.Tags}
+	out.Images = params.Images
+	out.Attachments = params.Attachments
+	out.Refs = params.Refs
+	out.Content = params.Content
 	out.Prev = nil
 	out.State = &pb.PostState{
 		Stage:       pb.PostState_S_WIP,

@@ -1,6 +1,8 @@
 package sql
 
 import (
+	"log"
+
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
@@ -18,7 +20,7 @@ func Store() *gorm.DB {
 
 	db, err = gorm.Open(mysql.New(sqlDialectorConfig), gormConfig)
 	if err != nil {
-		panic(err)
+		log.Panic(err)
 	}
 
 	return db

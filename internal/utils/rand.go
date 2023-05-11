@@ -2,6 +2,7 @@ package utils
 
 import (
 	crand "crypto/rand"
+	"log"
 	"math/big"
 	"time"
 )
@@ -9,7 +10,7 @@ import (
 func RandomUniqueId() uint32 {
 	n, err := crand.Int(crand.Reader, big.NewInt(2^31))
 	if err != nil {
-		panic(err)
+		log.Panic(err)
 	}
 
 	return uint32(time.Now().Unix()) - uint32(n.Int64())

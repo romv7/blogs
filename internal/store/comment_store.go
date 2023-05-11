@@ -2,6 +2,7 @@ package store
 
 import (
 	"errors"
+	"log"
 
 	"github.com/romv7/blogs/internal/pb"
 	sqlStore "github.com/romv7/blogs/internal/store/sql"
@@ -60,7 +61,7 @@ func (c *Comment) Proto() (out *pb.Comment) {
 		out = c.sqlModel.Proto()
 		out.Replies = cstore.TargetCommentProtoTree(out.Uuid)
 	default:
-		panic(ErrInvalidStore)
+		log.Panic(ErrInvalidStore)
 	}
 
 	return
@@ -79,17 +80,17 @@ func (s *CommentStore) NewComment(c *pb.Comment, t_uuid string, T pb.Comment_Tar
 
 	if s.t == SqlStore {
 		if err := setTheTargetFor(c, t_uuid, T); err != nil {
-			panic(err)
+			log.Panic(err)
 		}
 
 		cout, err := sqlModels.NewComment(c, t_uuid)
 		if err != nil {
-			panic(err)
+			log.Panic(err)
 		}
 
 		out.sqlModel = cout
 	} else {
-		panic(ErrInvalidStore)
+		log.Panic(ErrInvalidStore)
 	}
 
 	return
@@ -102,7 +103,7 @@ func (s *CommentStore) Save(c *Comment) (err error) {
 		res := db.Save(c.sqlModel)
 		err = res.Error
 	default:
-		panic(ErrInvalidStore)
+		log.Panic(ErrInvalidStore)
 	}
 
 	return
@@ -120,7 +121,7 @@ func (s *CommentStore) Delete(c *Comment) (err error) {
 
 		c = nil
 	default:
-		panic(ErrInvalidStore)
+		log.Panic(ErrInvalidStore)
 	}
 
 	return
@@ -138,7 +139,7 @@ func (s *CommentStore) GetById(id uint32) (out *Comment, err error) {
 			return nil, res.Error
 		}
 	default:
-		panic(ErrInvalidStore)
+		log.Panic(ErrInvalidStore)
 	}
 
 	return
@@ -157,7 +158,7 @@ func (s *CommentStore) GetByUuid(uuid string) (out *Comment, err error) {
 		}
 
 	default:
-		panic(ErrInvalidStore)
+		log.Panic(ErrInvalidStore)
 	}
 
 	return
@@ -192,7 +193,7 @@ func (s *CommentStore) TargetCommentProtoTree(t_uuid string) (out []*pb.Comment)
 		}
 
 	default:
-		panic(ErrInvalidStore)
+		log.Panic(ErrInvalidStore)
 	}
 
 	return
