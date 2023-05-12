@@ -169,3 +169,7 @@ func (p *Plain) Contains(key string) bool {
 
 	return true
 }
+
+func (p *Plain) SetRootPath(rootPath string) {
+	p.rootPath = rootPath
+}

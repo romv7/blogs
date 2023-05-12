@@ -53,8 +53,8 @@ func NewStorage(t StorageDriverType) (out *Storage) {
 	return
 }
 
-func NewPlainStorage() StorageDriver {
-	return NewStorage(Plain).drv
+func NewPlainStorage(rootPath string) StorageDriver {
+	return plain.NewPlain(rootPath)
 }
 
 func (s *Storage) Driver() StorageDriver {

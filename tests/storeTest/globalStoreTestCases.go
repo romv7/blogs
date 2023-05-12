@@ -196,5 +196,5 @@ var (
 func getRandIndex() int {
 	rand.Seed(time.Now().UnixNano())
 
-	return rand.Intn(len(globalUserTestCases) - 1)
+	return rand.Intn(len(globalUserTestCases) + 1 - 1)
 }

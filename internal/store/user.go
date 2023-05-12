@@ -5,7 +5,6 @@ import (
 	"log"
 
 	"github.com/romv7/blogs/internal/pb"
-	"github.com/romv7/blogs/internal/utils/author"
 )
 
 func (u *User) ToAuthor() *User {
@@ -19,9 +18,6 @@ func (u *User) ToAuthor() *User {
 	default:
 		log.Panic(ErrInvalidStore)
 	}
-
-	// TODO: Initialize the author's directory folder in the server.
-	author.NewAuthor(u.Proto())
 
 	return u
 }
@@ -74,6 +70,16 @@ func (u *User) Enable() (err error) {
 	}
 
 	return
+}
+
+func (u *User) AuthorRootResourceId() string {
+	auth := u.Proto()
+
+	if auth.Type != pb.User_T_AUTHOR {
+		log.Panic("normal user cannot have an author resource")
+	}
+
+	return auth.Uuid
 }
 
 func toggleDisabledProperty(u *User, val bool) (err error) {

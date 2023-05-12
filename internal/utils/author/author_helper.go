@@ -11,10 +11,12 @@ import (
 	"github.com/romv7/blogs/internal/constants"
 	"github.com/romv7/blogs/internal/pb"
 	"github.com/romv7/blogs/internal/storage"
+	"github.com/romv7/blogs/internal/store"
 )
 
 const (
 	NMAX_AUTHPART = 255
+	StoragePlain  = storage.Plain
 )
 
 var (
@@ -26,6 +28,7 @@ var (
 type AuthorHelper struct {
 	author     *pb.User
 	authorInfo *AuthorInfo
+	storage    storage.StorageDriver
 }
 
 type AuthorInfo struct {
@@ -50,19 +53,29 @@ type AuthorBlogMetadata struct {
 	References  []string `toml:"references"`
 }
 
-func NewAuthorHelper(u *pb.User) *AuthorHelper {
+func NewAuthorHelper(u *pb.User, s storage.StorageDriverType) (out *AuthorHelper) {
+	out = &AuthorHelper{}
+
 	if u.Type != pb.User_T_AUTHOR {
 		log.Panic(ErrAttemptCreateHelperForUser)
 	}
 
 	inf := &AuthorInfo{}
 
-	return &AuthorHelper{u, inf}
+	out.author = u
+	out.authorInfo = inf
+
+	switch s {
+	case StoragePlain:
+		out.storage = storage.NewPlainStorage(store.NewUserStore(store.SqlStore).NewUser(u).AuthorRootResourceId())
+	default:
+		log.Panic(storage.ErrorInvalidStorageDriver)
+	}
+
+	return
 }
 
 func NewAuthor(u *pb.User) {
-	storage.NewPlainStorage().Put("authors123/"+u.Uuid+"/author.toml", []byte("The quick brown fox jumps over the lazy dog."))
-	storage.NewPlainStorage().Put("authors123/"+u.Uuid+"/author.toml", []byte("Hello, world"))
 
 	return
 }

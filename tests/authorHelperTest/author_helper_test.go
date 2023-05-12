@@ -30,7 +30,7 @@ var (
 )
 
 func TestShouldCreateNewAuthorHelper(t *testing.T) {
-	if uh := author.NewAuthorHelper(mockUser.Proto()); uh == nil {
+	if uh := author.NewAuthorHelper(mockUser.Proto(), author.StoragePlain); uh == nil {
 		t.Errorf("unable to create author helper")
 	} else {
 
