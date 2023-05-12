@@ -1,4 +1,4 @@
-package author
+package constants
 
 type SocialLinkType uint
 

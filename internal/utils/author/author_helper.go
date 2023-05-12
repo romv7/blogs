@@ -2,11 +2,19 @@ package author
 
 import (
 	"bytes"
+	"compress/gzip"
 	"errors"
+	"fmt"
 	"log"
 
 	"github.com/BurntSushi/toml"
+	"github.com/romv7/blogs/internal/constants"
 	"github.com/romv7/blogs/internal/pb"
+	"github.com/romv7/blogs/internal/storage"
+)
+
+const (
+	NMAX_AUTHPART = 255
 )
 
 var (
@@ -21,10 +29,10 @@ type AuthorHelper struct {
 }
 
 type AuthorInfo struct {
-	Bio         string                      `toml:"bio"`
-	AltName     string                      `toml:"alt_name"`
-	Stats       *authorStats                `toml:"stats"`
-	SocialLinks map[SocialLinkType][]string `toml:"social_links"`
+	Bio         string                                `toml:"bio"`
+	AltName     string                                `toml:"alt_name"`
+	Stats       *authorStats                          `toml:"stats"`
+	SocialLinks map[constants.SocialLinkType][]string `toml:"social_links"`
 }
 
 type authorStats struct {
@@ -52,6 +60,13 @@ func NewAuthorHelper(u *pb.User) *AuthorHelper {
 	return &AuthorHelper{u, inf}
 }
 
+func NewAuthor(u *pb.User) {
+	storage.NewPlainStorage().Put("authors123/"+u.Uuid+"/author.toml", []byte("The quick brown fox jumps over the lazy dog."))
+	storage.NewPlainStorage().Put("authors123/"+u.Uuid+"/author.toml", []byte("Hello, world"))
+
+	return
+}
+
 func (ah *AuthorHelper) GetAuthorMetadata() *AuthorInfo {
 	return ah.authorInfo
 }
@@ -70,7 +85,7 @@ func (ah *AuthorHelper) SubscribeTo(u *pb.User) {
 	}
 }
 
-func (ah *AuthorHelper) AddSocialLink(s SocialLinkType, url string) {
+func (ah *AuthorHelper) AddSocialLink(s constants.SocialLinkType, url string) {
 	ah.authorInfo.SocialLinks[s] = append(ah.authorInfo.SocialLinks[s], url)
 }
 
@@ -100,6 +115,13 @@ func (ah *AuthorHelper) SaveAuthorPost(p *pb.Post) {
 	b := new(bytes.Buffer)
 
 	if err := toml.NewEncoder(b).Encode(metadata); err != nil {
+		log.Panic(err)
+	}
+
+	out := new(bytes.Buffer)
+	P := []byte(fmt.Sprintf("<!--\n%s\n-->\n\n%s", b.String(), p.Content))
+
+	if _, err := gzip.NewWriter(out).Write(P); err != nil {
 		log.Panic(err)
 	}
 

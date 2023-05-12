@@ -3,23 +3,60 @@ package storage
 import (
 	"errors"
 	"log"
-	"os"
+
+	"github.com/romv7/blogs/internal/storage/driver"
+	"github.com/romv7/blogs/internal/storage/driver/plain"
 )
 
-var (
-	ErrStorageDirNotSet = errors.New("STORAGE_DIR was not set")
+type StorageDriverType uint
 
-	storageDir = os.Getenv("STORAGE_DIR")
+const (
+	Plain StorageDriverType = iota
 )
 
-func init() {
-	if storageDir == "" {
-		log.Panic(ErrStorageDirNotSet)
-	}
+type StorageDriver interface {
+	//
+	Get(key string) (p []byte, err error)
+
+	//
+	Put(key string, b []byte) (err error)
+
+	//
+	Remove(key string) (err error)
+
+	//
+	Describe(key string) (res []*driver.PathInfo, err error)
+
+	//
+	Contains(key string) bool
 }
 
-type Storage struct{}
+var (
+	ErrorInvalidStorageDriver = errors.New("invalid storage driver selected")
+)
 
-func (s *Storage) WriteTo() {
+type Storage struct {
+	t   StorageDriverType
+	drv StorageDriver
+}
 
+func NewStorage(t StorageDriverType) (out *Storage) {
+	out = &Storage{t, nil}
+
+	switch t {
+	case Plain:
+		out.drv = plain.Default
+	default:
+		log.Panic(ErrorInvalidStorageDriver)
+	}
+
+	return
+}
+
+func NewPlainStorage() StorageDriver {
+	return NewStorage(Plain).drv
+}
+
+func (s *Storage) Driver() StorageDriver {
+	return s.drv
 }

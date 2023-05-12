@@ -36,3 +36,9 @@ func TestShouldCreateNewAuthorHelper(t *testing.T) {
 
 	}
 }
+
+func TestShouldCreateNewAuthor(t *testing.T) {
+
+	author.NewAuthor(mockUser.Proto())
+
+}
