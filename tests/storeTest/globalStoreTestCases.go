@@ -2,7 +2,6 @@ package storeTest
 
 import (
 	"errors"
-	"math/rand"
 	"time"
 
 	"github.com/google/uuid"
@@ -17,7 +16,7 @@ type userStoreTestCase struct {
 
 type postStoreTestCase struct {
 	u *pb.User
-	p *pb.Post
+	p []*pb.Post
 }
 
 type userStoreTestCases []*userStoreTestCase
@@ -25,9 +24,10 @@ type postStoreTestCases []*postStoreTestCase
 
 var (
 	globalUserTestCases = userStoreTestCases{
+
 		{
 			u: &pb.User{
-				Id:       utils.RandomUniqueId() + uint32(time.Now().Unix()),
+				Id:       utils.RandomUniqueId() + uint64(time.Now().Unix()),
 				Uuid:     uuid.NewString(),
 				Name:     "julie09",
 				Email:    "juliekelly@gmail.com",
@@ -44,12 +44,12 @@ var (
 
 		{
 			u: &pb.User{
-				Id:       utils.RandomUniqueId() + uint32(time.Now().Unix()),
+				Id:       utils.RandomUniqueId() + uint64(time.Now().Unix()),
 				Uuid:     uuid.NewString(),
 				Name:     "samuel35",
 				Email:    "samueljohnson@yahoo.com",
 				FullName: "Samuel Johnson",
-				Type:     pb.User_T_NORMAL,
+				Type:     pb.User_T_AUTHOR,
 				State: &pb.UserState{
 					CreatedAt: timestamppb.Now(),
 					UpdatedAt: nil,
@@ -58,14 +58,15 @@ var (
 				},
 			},
 		},
+
 		{
 			u: &pb.User{
-				Id:       utils.RandomUniqueId() + uint32(time.Now().Unix()),
+				Id:       utils.RandomUniqueId() + uint64(time.Now().Unix()),
 				Uuid:     uuid.NewString(),
 				Name:     "laurad42",
 				Email:    "lauradavis@hotmail.com",
 				FullName: "Laura Davis",
-				Type:     pb.User_T_NORMAL,
+				Type:     pb.User_T_AUTHOR,
 				State: &pb.UserState{
 					CreatedAt: timestamppb.Now(),
 					UpdatedAt: nil,
@@ -74,9 +75,10 @@ var (
 				},
 			},
 		},
+
 		{
 			u: &pb.User{
-				Id:       utils.RandomUniqueId() + uint32(time.Now().Unix()),
+				Id:       utils.RandomUniqueId() + uint64(time.Now().Unix()),
 				Uuid:     uuid.NewString(),
 				Name:     "adam25",
 				Email:    "adamsmith@gmail.com",
@@ -90,14 +92,15 @@ var (
 				},
 			},
 		},
+
 		{
 			u: &pb.User{
-				Id:       utils.RandomUniqueId() + uint32(time.Now().Unix()),
+				Id:       utils.RandomUniqueId() + uint64(time.Now().Unix()),
 				Uuid:     uuid.NewString(),
 				Name:     "sophiar29",
 				Email:    "sophiarodriguez@yahoo.com",
 				FullName: "Sophia Rodriguez",
-				Type:     pb.User_T_NORMAL,
+				Type:     pb.User_T_AUTHOR,
 				State: &pb.UserState{
 					CreatedAt: timestamppb.Now(),
 					UpdatedAt: nil,
@@ -111,78 +114,62 @@ var (
 	globalPostTestCases = postStoreTestCases{
 
 		{
-			u: globalUserTestCases[getRandIndex()].u,
-			p: &pb.Post{
-				Id:           utils.RandomUniqueId() + uint32(time.Now().Unix()),
-				Uuid:         uuid.NewString(),
-				HeadlineText: "How to Choose the Right Fitness Program for Your Goals",
-				SummaryText:  "",
-				Tags:         &pb.Tags{Data: []string{"fitness", "exercise", "workout"}},
-				State: &pb.PostState{
-					Stage:       pb.PostState_S_WIP,
-					Status:      pb.PostState_S_DRAFT,
-					CreatedAt:   timestamppb.Now(),
-					PublishedAt: nil,
-					RevisedAt:   nil,
-					ArchivedAt:  nil,
-					Reacts:      &pb.Reacts{},
+			u: &pb.User{
+				Id:       utils.RandomUniqueId() + uint64(time.Now().Unix()),
+				Uuid:     uuid.NewString(),
+				Name:     "rommms99",
+				Email:    "rommms@gmail.com",
+				FullName: "Rom Vales Villanueva",
+				Type:     pb.User_T_AUTHOR,
+				State: &pb.UserState{
+					CreatedAt: timestamppb.Now(),
+					UpdatedAt: nil,
+					Disabled:  false,
+					UVerified: true,
 				},
 			},
-		},
-		{
-			u: globalUserTestCases[getRandIndex()].u,
-			p: &pb.Post{
-				Id:           utils.RandomUniqueId() + uint32(time.Now().Unix()),
-				Uuid:         uuid.NewString(),
-				HeadlineText: "The Top 5 Benefits of Meditation for Your Mental Health",
-				SummaryText:  "",
-				Tags:         &pb.Tags{Data: []string{"meditation", "mindfulness", "mental health"}},
-				State: &pb.PostState{
-					Stage:       pb.PostState_S_PUB,
-					Status:      pb.PostState_S_DRAFT,
-					CreatedAt:   timestamppb.Now(),
-					PublishedAt: timestamppb.Now(),
-					RevisedAt:   nil,
-					ArchivedAt:  nil,
-					Reacts:      &pb.Reacts{},
+			p: []*pb.Post{
+				{
+					Id:           utils.RandomUniqueId() + uint64(time.Now().Unix()),
+					Uuid:         uuid.NewString(),
+					HeadlineText: "The Rise of Sustainable Fashion: How Brands are Embracing Eco-Friendly Practices",
+					SummaryText:  "Learn about the growing trend of sustainable fashion and how fashion brands are adopting eco-friendly practices.",
+					Tags:         &pb.Tags{Data: []string{"sustainability", "ethical", "eco-conscious"}},
 				},
-			},
-		},
-		{
-			u: globalUserTestCases[getRandIndex()].u,
-			p: &pb.Post{
-				Id:           utils.RandomUniqueId() + uint32(time.Now().Unix()),
-				Uuid:         uuid.NewString(),
-				HeadlineText: "The Benefits of Working Remotely: Why More Companies are Embracing Remote Work",
-				SummaryText:  "",
-				Tags:         &pb.Tags{Data: []string{"remote work", "telecommuting", "work-life balance"}},
-				State: &pb.PostState{
-					Stage:       pb.PostState_S_WIP,
-					Status:      pb.PostState_S_DRAFT,
-					CreatedAt:   timestamppb.Now(),
-					PublishedAt: timestamppb.Now(),
-					RevisedAt:   nil,
-					ArchivedAt:  nil,
-					Reacts:      &pb.Reacts{},
+				{
+					Id:           utils.RandomUniqueId() + uint64(time.Now().Unix()),
+					Uuid:         uuid.NewString(),
+					HeadlineText: "Maximizing Your Workout: Tips for Getting the Most Out of Your Gym Session",
+					SummaryText:  "Discover effective tips for optimizing your gym workouts to achieve your fitness goals.",
+					Tags:         &pb.Tags{Data: []string{"fitness", "exercise", "strength"}},
 				},
-			},
-		},
-		{
-			u: globalUserTestCases[getRandIndex()].u,
-			p: &pb.Post{
-				Id:           utils.RandomUniqueId() + uint32(time.Now().Unix()),
-				Uuid:         uuid.NewString(),
-				HeadlineText: "The Future of Artificial Intelligence: Trends to Watch in 2023 and Beyond",
-				SummaryText:  "",
-				Tags:         &pb.Tags{Data: []string{"artificial intelligence", "machine learning", "automation"}},
-				State: &pb.PostState{
-					Stage:       pb.PostState_S_PUB,
-					Status:      pb.PostState_S_DRAFT,
-					CreatedAt:   timestamppb.Now(),
-					PublishedAt: timestamppb.Now(),
-					RevisedAt:   nil,
-					ArchivedAt:  nil,
-					Reacts:      &pb.Reacts{},
+				{
+					Id:           utils.RandomUniqueId() + uint64(time.Now().Unix()),
+					Uuid:         uuid.NewString(),
+					HeadlineText: "Traveling on a Budget: How to See the World Without Breaking the Bank",
+					SummaryText:  "Learn how to travel on a budget with practical tips and tricks for saving money while exploring the world.",
+					Tags:         &pb.Tags{Data: []string{"budget", "adventure", "affordable"}},
+				},
+				{
+					Id:           utils.RandomUniqueId() + uint64(time.Now().Unix()),
+					Uuid:         uuid.NewString(),
+					HeadlineText: "The Benefits of Mindfulness Meditation: How It Can Improve Your Mental Health",
+					SummaryText:  "Explore the benefits of mindfulness meditation, including its ability to reduce stress, improve focus, and boost mental well-being.",
+					Tags:         &pb.Tags{Data: []string{"mindfulness", "meditation", "wellness"}},
+				},
+				{
+					Id:           utils.RandomUniqueId() + uint64(time.Now().Unix()),
+					Uuid:         uuid.NewString(),
+					HeadlineText: "Mastering the Art of Cooking: Essential Kitchen Skills for Every Home Chef",
+					SummaryText:  "Learn essential kitchen skills for mastering the art of cooking and taking your culinary game to the next level.",
+					Tags:         &pb.Tags{Data: []string{"cooking", "culinary", "recipes"}},
+				},
+				{
+					Id:           utils.RandomUniqueId() + uint64(time.Now().Unix()),
+					Uuid:         uuid.NewString(),
+					HeadlineText: "The Importance of Sleep: How It Affects Your Physical and Mental Health",
+					SummaryText:  "Discover the importance of sleep for maintaining good physical and mental health, and learn practical tips for improving your sleep quality.",
+					Tags:         &pb.Tags{Data: []string{"sleep", "rest", "recovery"}},
 				},
 			},
 		},
@@ -192,9 +179,3 @@ var (
 var (
 	ErrPropNotMatched = errors.New("property not matched")
 )
-
-func getRandIndex() int {
-	rand.Seed(time.Now().UnixNano())
-
-	return rand.Intn(len(globalUserTestCases) + 1 - 1)
-}

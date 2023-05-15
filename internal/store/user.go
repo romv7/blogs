@@ -5,7 +5,47 @@ import (
 	"log"
 
 	"github.com/romv7/blogs/internal/pb"
+	"github.com/romv7/blogs/internal/storage"
+	"github.com/romv7/blogs/internal/utils/author"
 )
+
+func (u *User) Metadata() *author.AuthorInfo {
+	if u.Proto().Type != pb.User_T_AUTHOR {
+		return nil
+	}
+
+	switch u.s {
+	case storage.Plain:
+		ah := author.NewAuthorHelper(u.Proto(), u.s)
+		return ah.GetAuthorMetadata()
+	default:
+		log.Panic(storage.ErrorInvalidStorageDriver)
+	}
+
+	return nil
+}
+
+func (u *User) Save() (err error) {
+	ustore := NewUserStore(u.t)
+	err = ustore.Save(u)
+
+	return
+}
+
+func (u *User) Delete() (err error) {
+	ustore := NewUserStore(u.t)
+
+	if err = ustore.Delete(u); err != nil {
+		return
+	}
+
+	if u.Proto().Type == pb.User_T_AUTHOR {
+		ah := author.NewAuthorHelper(u.Proto(), storage.Plain)
+		err = ah.DeleteAuthorMetadata()
+	}
+
+	return
+}
 
 func (u *User) ToAuthor() *User {
 	if u.Proto().Type == pb.User_T_AUTHOR {
@@ -23,6 +63,9 @@ func (u *User) ToAuthor() *User {
 }
 
 func (u *User) ToNormal() *User {
+	if u.Proto().Type == pb.User_T_NORMAL {
+		return u
+	}
 
 	switch u.t {
 	case SqlStore:
@@ -72,14 +115,12 @@ func (u *User) Enable() (err error) {
 	return
 }
 
-func (u *User) AuthorRootResourceId() string {
-	auth := u.Proto()
-
-	if auth.Type != pb.User_T_AUTHOR {
-		log.Panic("normal user cannot have an author resource")
+func (u *User) IsAuthor() bool {
+	if u.Proto().Type == pb.User_T_AUTHOR {
+		return true
 	}
 
-	return auth.Uuid
+	return false
 }
 
 func toggleDisabledProperty(u *User, val bool) (err error) {

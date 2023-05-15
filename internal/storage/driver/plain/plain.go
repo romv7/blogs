@@ -14,25 +14,30 @@ type Plain struct {
 }
 
 var (
-	Default = NewPlain(os.Getenv("STORAGE_DIR"))
+	STORAGE_DIR = os.Getenv("STORAGE_DIR")
+	Default     = NewPlain()
 
 	ErrAttemptReadDir     = errors.New("attempt to read dir")
 	ErrPutOnExistFile     = errors.New("attempt to put a new data on an existing file")
 	ErrRemoveNotExistFile = errors.New("attempt to remove a non existing file")
 )
 
-func NewPlain(rpath string) *Plain {
+func NewPlain(rpath ...string) *Plain {
+	path := []string{STORAGE_DIR}
+	path = append(path, rpath...)
+	p := strings.Join(path, "/")
+
 	var err error
 
-	if _, err = os.ReadDir(rpath); os.IsNotExist(err) {
-		err = os.Mkdir(rpath, os.ModeDir)
+	if _, err = os.ReadDir(p); os.IsNotExist(err) {
+		err = os.MkdirAll(p, os.FileMode(0700))
 	}
 
 	if err != nil {
 		log.Panic(err)
 	}
 
-	return &Plain{rpath}
+	return &Plain{p}
 }
 
 // Tries to lookup a file from the file system. If it does not found a file specified by
@@ -57,32 +62,11 @@ func (p *Plain) Put(key string, b []byte) (err error) {
 	path := []string{p.rootPath}
 	tokens := strings.Split(key, "/")
 
-	for i := range tokens[:len(tokens)-1] {
-		path = append(path, tokens[i])
-
-		tpath := strings.Join(path, "/")
-
-		if fstat, err := os.Stat(tpath); err != nil {
-
-			// If it is only an os.ErrNotExist ignore and don't panic.
-			if !errors.Is(err, os.ErrNotExist) {
-				log.Panic(err)
-			}
-
-		} else if fstat.Mode().IsDir() {
-			// If the directory already exist check whether it's a directory
-			// or a file. If it is a file, return an error.
-			continue
-		} else if fstat.Mode().IsRegular() {
-			return ErrPutOnExistFile
-		}
-
-		if err = os.Mkdir(tpath, os.FileMode(0700)); err != nil {
-			log.Panic(err)
-		}
+	if err = os.MkdirAll(p.rootPath+"/"+strings.Join(tokens[:len(tokens)-1], "/"), os.FileMode(0700)); err != nil {
+		log.Panic(err)
 	}
 
-	path = append(path, tokens[len(tokens)-1])
+	path = append(path, key)
 
 	if err := os.WriteFile(strings.Join(path, "/"), b, os.FileMode(0644)); err != nil {
 		log.Panic(err)

@@ -7,11 +7,12 @@ import (
 	"github.com/romv7/blogs/internal/pb"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
+	"gorm.io/gorm"
 )
 
 type Post struct {
-	ID          uint32              `gorm:"column:id;autoIncrement:false"`
-	UserId      uint32              `gorm:"column:user_id"`
+	ID          uint64              `gorm:"column:id;autoIncrement:false"`
+	UserId      uint64              `gorm:"column:user_id"`
 	Uuid        string              `gorm:"column:uuid;unique"`
 	Tags        []byte              `gorm:"column:tags;type:blob"`
 	Reacts      []byte              `gorm:"column:reacts;type:blob"`
@@ -21,7 +22,13 @@ type Post struct {
 	ArchivedAt  time.Time           `gorm:"column:archived_at"`
 	PublishedAt time.Time           `gorm:"column:published_at"`
 	CreatedAt   time.Time           `gorm:"column:created_at"`
-	PrevId      uint32              `gorm:"column:prev_id"`
+	PrevId      uint64              `gorm:"column:prev_id"`
+
+	HeadlineText string   `gorm:"-"`
+	SummaryText  string   `gorm:"-"`
+	Attachments  []string `gorm:"-"`
+	Refs         []string `gorm:"-"`
+	Images       []string `gorm:"-"`
 }
 
 func NewPost(p *pb.Post) (out *Post) {
@@ -36,17 +43,22 @@ func NewPost(p *pb.Post) (out *Post) {
 	}
 
 	out = &Post{
-		ID:          p.Id,
-		UserId:      p.User.Id,
-		Uuid:        p.Uuid,
-		Tags:        tags_b,
-		Reacts:      reacts_b,
-		Stage:       p.State.Stage,
-		Status:      p.State.Status,
-		RevisedAt:   p.State.RevisedAt.AsTime(),
-		ArchivedAt:  p.State.ArchivedAt.AsTime(),
-		PublishedAt: p.State.PublishedAt.AsTime(),
-		CreatedAt:   p.State.CreatedAt.AsTime(),
+		ID:           p.Id,
+		UserId:       p.User.Id,
+		Uuid:         p.Uuid,
+		Tags:         tags_b,
+		Reacts:       reacts_b,
+		Stage:        p.State.Stage,
+		HeadlineText: p.HeadlineText,
+		SummaryText:  p.SummaryText,
+		Images:       p.Images,
+		Refs:         p.Refs,
+		Attachments:  p.Attachments,
+		Status:       p.State.Status,
+		RevisedAt:    p.State.RevisedAt.AsTime(),
+		ArchivedAt:   p.State.ArchivedAt.AsTime(),
+		PublishedAt:  p.State.PublishedAt.AsTime(),
+		CreatedAt:    p.State.CreatedAt.AsTime(),
 	}
 
 	if p.Prev != nil {
@@ -56,10 +68,19 @@ func NewPost(p *pb.Post) (out *Post) {
 	return
 }
 
+func (p *Post) BeforeUpdate(tx *gorm.DB) error {
+
+	return nil
+}
+
 func (p *Post) Proto() (out *pb.Post) {
 	out = &pb.Post{
-		Id:   p.ID,
-		Uuid: p.Uuid,
+		Id:           p.ID,
+		Uuid:         p.Uuid,
+		HeadlineText: p.HeadlineText,
+		SummaryText:  p.SummaryText,
+		Images:       p.Images,
+		Attachments:  p.Attachments,
 		State: &pb.PostState{
 			Stage:  p.Stage,
 			Status: p.Status,

@@ -7,11 +7,11 @@ import (
 	"time"
 )
 
-func RandomUniqueId() uint32 {
+func RandomUniqueId() uint64 {
 	n, err := crand.Int(crand.Reader, big.NewInt(2^31))
 	if err != nil {
 		log.Panic(err)
 	}
 
-	return uint32(time.Now().Unix()) - uint32(n.Int64())
+	return uint64(time.Now().Hour()) - uint64(n.Int64())
 }

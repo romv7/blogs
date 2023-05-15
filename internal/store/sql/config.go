@@ -23,7 +23,9 @@ var (
 		Loc:                  time.UTC,
 	}
 
-	gormConfig = &gorm.Config{}
+	gormConfig = &gorm.Config{
+		PrepareStmt: true,
+	}
 
 	sqlDialectorConfig = gorm_mysql.Config{
 		DSNConfig:         sqlConfig,

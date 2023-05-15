@@ -10,9 +10,9 @@ import (
 )
 
 type Comment struct {
-	ID          uint32                `gorm:"column:id;autoIncrement:false"`
+	ID          uint64                `gorm:"column:id;autoIncrement:false"`
 	Uuid        string                `gorm:"column:uuid;unique"`
-	UserId      uint32                `gorm:"column:user_id"`
+	UserId      uint64                `gorm:"column:user_id"`
 	CommentText []byte                `gorm:"column:comment_text;type:blob"`
 	Reacts      []byte                `gorm:"column:reacts;type:blob"`
 	CreatedAt   time.Time             `gorm:"column:created_at"`

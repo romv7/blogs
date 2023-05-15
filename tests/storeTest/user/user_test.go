@@ -14,7 +14,7 @@ import (
 var (
 	ustore   = store.NewUserStore(store.SqlStore)
 	mockUser = ustore.NewUser(&pb.User{
-		Id:       utils.RandomUniqueId() + uint32(time.Now().Unix()),
+		Id:       utils.RandomUniqueId() + uint64(time.Now().Unix()),
 		Uuid:     uuid.NewString(),
 		Name:     "quietfox",
 		FullName: "Rom Vales Villanueva",
@@ -30,8 +30,8 @@ var (
 )
 
 func TestShouldUpdateUserType(t *testing.T) {
-	ustore.Save(mockUser)
-	defer ustore.Delete(mockUser)
+	mockUser.Save()
+	defer mockUser.Delete()
 
 	if err := ustore.Save(mockUser.ToNormal()); err != nil {
 		t.Error(err)

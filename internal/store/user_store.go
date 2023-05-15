@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"github.com/romv7/blogs/internal/pb"
+	"github.com/romv7/blogs/internal/storage"
 	sqlStore "github.com/romv7/blogs/internal/store/sql"
 	sqlModels "github.com/romv7/blogs/internal/store/sql/models"
 
@@ -13,6 +14,7 @@ import (
 
 type User struct {
 	t        StoreType
+	s        storage.StorageDriverType
 	sqlModel *sqlModels.User
 }
 
@@ -30,10 +32,11 @@ func (u *User) Proto() *pb.User {
 
 type UserStore struct {
 	t StoreType
+	s storage.StorageDriverType
 }
 
 func NewUserStore(t StoreType) *UserStore {
-	return &UserStore{t}
+	return &UserStore{t, storage.Plain}
 }
 
 func (s *UserStore) GetMainStore() (S any) {
@@ -58,6 +61,9 @@ func (s *UserStore) NewUser(u *pb.User) (out *User) {
 		log.Panic(ErrInvalidStore)
 	}
 
+	// Set the storage type
+	out.s = s.s
+
 	return
 }
 
@@ -67,7 +73,6 @@ func (s *UserStore) Save(u *User) (err error) {
 	case SqlStore:
 		db := sqlStore.Store()
 		res := db.Save(u.sqlModel)
-
 		err = res.Error
 	default:
 		log.Panic(ErrInvalidStore)
@@ -94,16 +99,17 @@ func (s *UserStore) Delete(u *User) (err error) {
 	return
 }
 
-func (s *UserStore) GetById(id uint32) (out *User, err error) {
+// PROBLEM: Sometimes GetById is returning record not found even though the record exist.
+func (s *UserStore) GetById(id uint64) (out *User, err error) {
 	out = &User{}
 
 	switch s.t {
 	case SqlStore:
 		db := sqlStore.Store()
 		out.t = s.t
-		out.sqlModel = &sqlModels.User{}
+		out.sqlModel = &sqlModels.User{ID: id}
 
-		if res := db.Where("id = ?", id).First(out.sqlModel); errors.Is(res.Error, gorm.ErrRecordNotFound) {
+		if res := db.First(out.sqlModel); errors.Is(res.Error, gorm.ErrRecordNotFound) {
 			return nil, res.Error
 		}
 

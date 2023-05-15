@@ -14,11 +14,11 @@ import (
 
 var (
 	mockUser = store.NewUserStore(store.SqlStore).NewUser(&pb.User{
-		Id:       utils.RandomUniqueId() + uint32(time.Now().Unix()),
+		Id:       utils.RandomUniqueId() + uint64(time.Now().Unix()),
 		Uuid:     uuid.NewString(),
-		Name:     "romdevmod",
+		Name:     "rom123",
 		FullName: "Rom Vales Villanueva",
-		Email:    "romdevmod@gmail.com",
+		Email:    "romlas@gmail.com",
 		Type:     pb.User_T_AUTHOR,
 		State: &pb.UserState{
 			CreatedAt: timestamppb.Now(),
@@ -30,15 +30,15 @@ var (
 )
 
 func TestShouldCreateNewAuthorHelper(t *testing.T) {
+	if err := mockUser.Save(); err != nil {
+		t.Error(err)
+	}
+
+	defer mockUser.Delete()
+
 	if uh := author.NewAuthorHelper(mockUser.Proto(), author.StoragePlain); uh == nil {
 		t.Errorf("unable to create author helper")
 	} else {
 
 	}
-}
-
-func TestShouldCreateNewAuthor(t *testing.T) {
-
-	author.NewAuthor(mockUser.Proto())
-
 }

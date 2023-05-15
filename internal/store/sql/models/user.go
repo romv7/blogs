@@ -4,15 +4,16 @@ import (
 	"time"
 
 	"github.com/romv7/blogs/internal/pb"
+	"github.com/romv7/blogs/internal/utils/author"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 type User struct {
-	ID        uint32       `gorm:"column:id;autoIncrement:false"`
+	ID        uint64       `gorm:"column:id;autoIncrement:false"`
 	Uuid      string       `gorm:"column:uuid;unique"`
 	Name      string       `gorm:"column:name"`
 	FullName  string       `gorm:"column:fname"`
-	Email     string       `gorm:"column:email;unique"`
+	Email     string       `gorm:"column:email"`
 	Type      pb.User_Type `gorm:"column:type"`
 	Disabled  bool         `gorm:"column:is_disabled"`
 	Verified  bool         `gorm:"column:is_verified"`
@@ -51,6 +52,10 @@ func (u *User) Proto() (out *pb.User) {
 			Disabled:  u.Disabled,
 			UVerified: u.Verified,
 		},
+	}
+
+	if out.Type == pb.User_T_AUTHOR {
+		out.StoragePath = author.AuthorRootResourceId(out)
 	}
 
 	return

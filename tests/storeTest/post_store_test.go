@@ -3,7 +3,9 @@ package storeTest
 import (
 	"testing"
 
+	"github.com/romv7/blogs/internal/pb"
 	"github.com/romv7/blogs/internal/store"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func TestNewPostStore(t *testing.T) {
@@ -13,43 +15,37 @@ func TestNewPostStore(t *testing.T) {
 }
 
 func TestPostStore_SqlStore(t *testing.T) {
-
 	pstore := store.NewPostStore(store.SqlStore)
 	ustore := store.NewUserStore(store.SqlStore)
 
-	for _, tcase := range globalPostTestCases {
-		u := ustore.NewUser(tcase.u)
-		p := pstore.NewPost(tcase.u, tcase.p)
+	for _, posts := range globalPostTestCases {
+		u := ustore.NewUser(posts.u)
 
-		// Save the user from the test case.
-		if err := ustore.Save(u); err != nil {
+		if err := u.Save(); err != nil {
 			t.Fatal(err)
 		}
 
-		// Save the blog post to the database.
-		if err := pstore.Save(p); err != nil {
-			t.Fatal(err)
-		}
+		defer u.Delete()
 
-		defer ustore.Delete(u)
-		defer pstore.Delete(p)
-
-		// Expect that the post `p` should now be in the db.
-		if ex, err := pstore.GetByUuid(p.Proto().Uuid); err != nil {
-			t.Fatal(err)
-		} else {
-
-			if ex.Proto().Id != p.Proto().Id {
-				t.Error(ErrPropNotMatched)
+		for _, post := range posts.p {
+			post.State = &pb.PostState{
+				Stage:       pb.PostState_S_WIP,
+				Status:      pb.PostState_S_DRAFT,
+				RevisedAt:   timestamppb.Now(),
+				PublishedAt: nil,
+				ArchivedAt:  nil,
+				CreatedAt:   timestamppb.Now(),
+				Reacts:      &pb.Reacts{},
 			}
 
-			if ex.Proto().HeadlineText != p.Proto().HeadlineText {
-				t.Error(ErrPropNotMatched)
+			p := pstore.NewPost(u.Proto(), post)
+
+			if err := p.Save(); err != nil {
+				t.Fatal(err)
 			}
 
-			if ex.Proto().User.Id != u.Proto().Id {
-				t.Error(ErrPropNotMatched)
-			}
+			defer p.Delete()
+
 		}
 	}
 

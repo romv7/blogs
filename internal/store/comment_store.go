@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"github.com/romv7/blogs/internal/pb"
+	"github.com/romv7/blogs/internal/storage"
 	sqlStore "github.com/romv7/blogs/internal/store/sql"
 	sqlModels "github.com/romv7/blogs/internal/store/sql/models"
 
@@ -50,16 +51,25 @@ func setTheTargetFor(c *pb.Comment, t_uuid string, T pb.Comment_TargetType) (err
 
 type Comment struct {
 	t        StoreType
+	s        storage.StorageDriverType
 	sqlModel *sqlModels.Comment
 }
 
 func (c *Comment) Proto() (out *pb.Comment) {
 	cstore := NewCommentStore(SqlStore)
+	ustore := NewUserStore(SqlStore)
 
 	switch c.t {
 	case SqlStore:
 		out = c.sqlModel.Proto()
 		out.Replies = cstore.TargetCommentProtoTree(out.Uuid)
+
+		if u, err := ustore.GetById(c.sqlModel.UserId); err != nil {
+			// TODO: Handle comment that has no owner
+		} else {
+			out.User = u.Proto()
+		}
+
 	default:
 		log.Panic(ErrInvalidStore)
 	}
@@ -69,10 +79,22 @@ func (c *Comment) Proto() (out *pb.Comment) {
 
 type CommentStore struct {
 	t StoreType
+	s storage.StorageDriverType
 }
 
 func NewCommentStore(t StoreType) *CommentStore {
-	return &CommentStore{t}
+	return &CommentStore{t, storage.Plain}
+}
+
+func (s *CommentStore) GetMainStore() (S any) {
+	switch s.t {
+	case SqlStore:
+		S = sqlStore.Store()
+	default:
+		log.Panic(ErrInvalidStore)
+	}
+
+	return
 }
 
 func (s *CommentStore) NewComment(c *pb.Comment, t_uuid string, T pb.Comment_TargetType) (out *Comment) {
@@ -127,15 +149,15 @@ func (s *CommentStore) Delete(c *Comment) (err error) {
 	return
 }
 
-func (s *CommentStore) GetById(id uint32) (out *Comment, err error) {
+func (s *CommentStore) GetById(id uint64) (out *Comment, err error) {
 	out = &Comment{}
 
 	switch s.t {
 	case SqlStore:
 		db := sqlStore.Store()
 		out.t = s.t
-		out.sqlModel = &sqlModels.Comment{}
-		if res := db.Where("id = ?", id).First(out.sqlModel); errors.Is(res.Error, gorm.ErrRecordNotFound) {
+		out.sqlModel = &sqlModels.Comment{ID: id}
+		if res := db.First(out.sqlModel); errors.Is(res.Error, gorm.ErrRecordNotFound) {
 			return nil, res.Error
 		}
 	default:
@@ -153,7 +175,7 @@ func (s *CommentStore) GetByUuid(uuid string) (out *Comment, err error) {
 		db := sqlStore.Store()
 		out.t = s.t
 		out.sqlModel = &sqlModels.Comment{}
-		if res := db.Where("uuid = ?", uuid).First(out.sqlModel); errors.Is(res.Error, gorm.ErrRecordNotFound) {
+		if res := db.Where("uuid = ?", uuid).Limit(1).Find(out.sqlModel); errors.Is(res.Error, gorm.ErrRecordNotFound) {
 			return nil, res.Error
 		}
 
@@ -181,7 +203,7 @@ func (s *CommentStore) TargetCommentProtoTree(t_uuid string) (out []*pb.Comment)
 			c := res.Proto()
 
 			if u, err := ustore.GetById(res.UserId); err != nil {
-				// @TODO (Handle comment that has no owner)
+				// TODO: Handle comment that has no owner
 			} else {
 				c.User = u.Proto()
 			}
