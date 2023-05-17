@@ -116,7 +116,7 @@ func (ah *AuthorHelper) GetAuthorMetadata() *AuthorInfo {
 	return ah.authorInfo
 }
 
-func (ah *AuthorHelper) DeleteAuthorMetadata() error {
+func (ah *AuthorHelper) DeleteAuthorMetadata() (err error) {
 	return ah.storage.Remove(authorInfoFileKey)
 }
 

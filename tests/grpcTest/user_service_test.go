@@ -12,7 +12,7 @@ import (
 )
 
 func TestNewUser(t *testing.T) {
-	u := &endpoint.U{}
+	u := &endpoint.UserService{}
 
 	startTestServer(u)
 	defer closeTestServer()
@@ -50,7 +50,7 @@ func TestNewUser(t *testing.T) {
 }
 
 func TestSaveUser(t *testing.T) {
-	u := &endpoint.U{}
+	u := &endpoint.UserService{}
 
 	startTestServer(u)
 	defer closeTestServer()
@@ -90,6 +90,45 @@ func TestSaveUser(t *testing.T) {
 
 		if _, err := ustore.GetByUuid(u.Uuid); errors.Is(err, gorm.ErrRecordNotFound) {
 			t.Errorf("client.Save did not properly saved the record to the database")
+		}
+	}
+}
+
+func TestDeleteUser(t *testing.T) {
+	u := &endpoint.UserService{}
+
+	startTestServer(u)
+	defer closeTestServer()
+
+	conn, client := createTestUserClient()
+	defer conn.Close()
+
+	ustore := store.NewUserStore(store.SqlStore)
+
+	for _, tcase := range globalTestCases {
+		if tcase.For != UserServiceTest {
+			continue
+		}
+
+		params := &pb.UserService_New_Params{
+			Name:     tcase.testValues["name"].(string),
+			Email:    tcase.testValues["email"].(string),
+			FullName: tcase.testValues["full_name"].(string),
+			Type:     pb.User_Type(tcase.testValues["type"].(int)),
+		}
+
+		pbuser, err := client.New(context.Background(), params)
+		if err != nil {
+			t.Error(err)
+		}
+
+		if err := ustore.NewUser(pbuser).Save(); err != nil {
+			t.Error(err)
+		}
+
+		_, err = client.Delete(context.Background(), &pb.UserService_Delete_Params{User: pbuser})
+		if err != nil {
+			t.Error(err)
 		}
 	}
 }

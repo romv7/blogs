@@ -33,7 +33,9 @@ func TestShouldUpdateUserType(t *testing.T) {
 	mockUser.Save()
 	defer mockUser.Delete()
 
-	if err := ustore.Save(mockUser.ToNormal()); err != nil {
+	var def = mockUser.Proto().Type
+
+	if err := mockUser.ToNormal().Save(); err != nil {
 		t.Error(err)
 	}
 
@@ -44,6 +46,10 @@ func TestShouldUpdateUserType(t *testing.T) {
 		if u.Proto().Type != pb.User_T_NORMAL {
 			t.Errorf("u.Proto().Type did not match the expected enum pb.USER_T_NORMAL")
 		}
+	}
+
+	if def == pb.User_T_AUTHOR {
+		mockUser.ToAuthor().Save()
 	}
 }
 

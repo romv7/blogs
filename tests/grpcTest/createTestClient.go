@@ -17,6 +17,7 @@ type grpcTestCases []*grpcTestCase
 const (
 	BlogServiceTest = iota
 	UserServiceTest
+	BlogServiceTest_Comment
 )
 
 func dialGrpcClientConn() *grpc.ClientConn {

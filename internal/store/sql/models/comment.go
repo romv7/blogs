@@ -53,9 +53,7 @@ func (c *Comment) Proto() (out *pb.Comment) {
 		Id:         c.ID,
 		Uuid:       c.Uuid,
 		TargetType: c.TargetType,
-		Target:     nil,
 		State: &pb.CommentState{
-			Reacts:    nil,
 			CreatedAt: timestamppb.New(c.CreatedAt),
 			EditedAt:  timestamppb.New(c.EditedAt),
 		},

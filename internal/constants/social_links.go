@@ -1,5 +1,9 @@
 package constants
 
+// Provides a set of enum values for what are the available social link types
+// that can be added into the users info. This is not an exhaustive list,
+// if there is an unknown social link type that a user wants to add, what they can do
+// is issue a ticket so that we could add the social link type they want.
 type SocialLinkType string
 
 const (

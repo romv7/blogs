@@ -100,6 +100,15 @@ func (s *UserStore) Delete(u *User) (err error) {
 }
 
 // PROBLEM: Sometimes GetById is returning record not found even though the record exist.
+
+// RESOLVED:
+//
+//	Turns out that this function is not the problem, the reason why this method
+//	is returning a record not found is that the unit test were tightly interconnected
+//	as a result, when one test deleted a user and the other tries to GetById the record it
+//	is apparent that it should return a not found error because the other test already deleted
+//	the record we are trying to lookup with GetById.
+
 func (s *UserStore) GetById(id uint64) (out *User, err error) {
 	out = &User{}
 

@@ -12,11 +12,11 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-type U struct {
+type UserService struct {
 	pb.UnimplementedUserServiceServer
 }
 
-func (svc *U) New(ctx context.Context, params *pb.UserService_New_Params) (*pb.User, error) {
+func (svc *UserService) New(ctx context.Context, params *pb.UserService_New_Params) (*pb.User, error) {
 	if len(params.Name) == 0 ||
 		len(params.Email) == 0 ||
 		len(params.FullName) == 0 {
@@ -38,19 +38,28 @@ func (svc *U) New(ctx context.Context, params *pb.UserService_New_Params) (*pb.U
 	return out, nil
 }
 
-func (svc *U) Save(ctx context.Context, params *pb.UserService_Save_Params) (*pb.UserService_Save_Response, error) {
+func (svc *UserService) Save(ctx context.Context, params *pb.UserService_Save_Params) (*pb.UserService_Save_Response, error) {
 	if params.User == nil {
-		return nil, status.Errorf(codes.InvalidArgument, ErrNotEnoughArgument.Error())
+		return &pb.UserService_Save_Response{}, status.Errorf(codes.InvalidArgument, ErrNotEnoughArgument.Error())
 	}
 
 	ustore := store.NewUserStore(store.SqlStore)
-	if err := ustore.Save(ustore.NewUser(params.User)); err != nil {
-		return nil, status.Errorf(codes.Internal, err.Error())
+	if err := ustore.NewUser(params.User).Save(); err != nil {
+		return &pb.UserService_Save_Response{}, status.Errorf(codes.Internal, err.Error())
 	}
 
 	return &pb.UserService_Save_Response{}, nil
 }
 
-func (svc *U) Delete(ctx context.Context, params *pb.UserService_Delete_Params) (*pb.UserService_Delete_Response, error) {
+func (svc *UserService) Delete(ctx context.Context, params *pb.UserService_Delete_Params) (*pb.UserService_Delete_Response, error) {
+	if params.User == nil {
+		return &pb.UserService_Delete_Response{}, status.Errorf(codes.InvalidArgument, ErrNotEnoughArgument.Error())
+	}
+
+	ustore := store.NewUserStore(store.SqlStore)
+	if err := ustore.NewUser(params.User).Delete(); err != nil {
+		return &pb.UserService_Delete_Response{}, status.Errorf(codes.Internal, err.Error())
+	}
+
 	return &pb.UserService_Delete_Response{}, nil
 }

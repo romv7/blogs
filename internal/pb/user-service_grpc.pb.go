@@ -22,8 +22,11 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type UserServiceClient interface {
+	// Instantiate a new User using the provided details by the end user of the RPC service.
 	New(ctx context.Context, in *UserService_New_Params, opts ...grpc.CallOption) (*User, error)
+	// Persists the user to any persistent storage defined in the internal service.
 	Save(ctx context.Context, in *UserService_Save_Params, opts ...grpc.CallOption) (*UserService_Save_Response, error)
+	// Destructive RPC command, removes a user from the internal persistent storage.
 	Delete(ctx context.Context, in *UserService_Delete_Params, opts ...grpc.CallOption) (*UserService_Delete_Response, error)
 }
 
@@ -66,8 +69,11 @@ func (c *userServiceClient) Delete(ctx context.Context, in *UserService_Delete_P
 // All implementations must embed UnimplementedUserServiceServer
 // for forward compatibility
 type UserServiceServer interface {
+	// Instantiate a new User using the provided details by the end user of the RPC service.
 	New(context.Context, *UserService_New_Params) (*User, error)
+	// Persists the user to any persistent storage defined in the internal service.
 	Save(context.Context, *UserService_Save_Params) (*UserService_Save_Response, error)
+	// Destructive RPC command, removes a user from the internal persistent storage.
 	Delete(context.Context, *UserService_Delete_Params) (*UserService_Delete_Response, error)
 	mustEmbedUnimplementedUserServiceServer()
 }

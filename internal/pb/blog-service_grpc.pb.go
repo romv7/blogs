@@ -22,13 +22,24 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type BlogServiceClient interface {
+	// Using the provided BlogService_NewBlogPost_Params, it creates a new blog post from the
+	// argument. Take note that this does not totally persist the data to any persistence storage.
+	// That is the job of the rpc SaveBlogPost!
 	NewBlogPost(ctx context.Context, in *BlogService_NewBlogPost_Params, opts ...grpc.CallOption) (*Post, error)
+	// Persist the provided post inthe BlogService_SaveBlogPost_params argument to any persistent
+	// storage.
 	SaveBlogPost(ctx context.Context, in *BlogService_SaveBlogPost_Params, opts ...grpc.CallOption) (*BlogService_SaveBlogPost_Response, error)
+	// Destructive! Removes a blog post from any persistent storage in the internal service.
 	DeleteBlogPost(ctx context.Context, in *BlogService_DeleteBlogPost_Params, opts ...grpc.CallOption) (*BlogService_DeleteBlogPost_Response, error)
+	// Gets the specific blog post identified by the argument passed to the GetBlogPost from the persistent storage.
+	GetBlogPost(ctx context.Context, in *BlogService_GetBlogPost_Params, opts ...grpc.CallOption) (*Post, error)
+	// Creates a new comment for the target uuid provided as an argument. Like NewBlogPost this does
+	// not totally save the new comment to any storage.
 	NewComment(ctx context.Context, in *BlogService_NewComment_Params, opts ...grpc.CallOption) (*Comment, error)
+	// Commits the comment passed as an argument to the BlogService_SaveComment_Params to any persistent storage.
 	SaveComment(ctx context.Context, in *BlogService_SaveComment_Params, opts ...grpc.CallOption) (*BlogService_SaveComment_Response, error)
+	// Destructive! Removes the comment from any persistence storage in thte internal service. (Sounds similar to the DeleteBlogPost!)
 	DeleteComment(ctx context.Context, in *BlogService_DeleteComment_Params, opts ...grpc.CallOption) (*BlogService_DeleteComment_Response, error)
-	ReplyToComment(ctx context.Context, in *BlogService_ReplyToComment_Params, opts ...grpc.CallOption) (*BlogService_ReplyToComment_Response, error)
 }
 
 type blogServiceClient struct {
@@ -66,6 +77,15 @@ func (c *blogServiceClient) DeleteBlogPost(ctx context.Context, in *BlogService_
 	return out, nil
 }
 
+func (c *blogServiceClient) GetBlogPost(ctx context.Context, in *BlogService_GetBlogPost_Params, opts ...grpc.CallOption) (*Post, error) {
+	out := new(Post)
+	err := c.cc.Invoke(ctx, "/blogs.BlogService/GetBlogPost", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *blogServiceClient) NewComment(ctx context.Context, in *BlogService_NewComment_Params, opts ...grpc.CallOption) (*Comment, error) {
 	out := new(Comment)
 	err := c.cc.Invoke(ctx, "/blogs.BlogService/NewComment", in, out, opts...)
@@ -93,26 +113,28 @@ func (c *blogServiceClient) DeleteComment(ctx context.Context, in *BlogService_D
 	return out, nil
 }
 
-func (c *blogServiceClient) ReplyToComment(ctx context.Context, in *BlogService_ReplyToComment_Params, opts ...grpc.CallOption) (*BlogService_ReplyToComment_Response, error) {
-	out := new(BlogService_ReplyToComment_Response)
-	err := c.cc.Invoke(ctx, "/blogs.BlogService/ReplyToComment", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 // BlogServiceServer is the server API for BlogService service.
 // All implementations must embed UnimplementedBlogServiceServer
 // for forward compatibility
 type BlogServiceServer interface {
+	// Using the provided BlogService_NewBlogPost_Params, it creates a new blog post from the
+	// argument. Take note that this does not totally persist the data to any persistence storage.
+	// That is the job of the rpc SaveBlogPost!
 	NewBlogPost(context.Context, *BlogService_NewBlogPost_Params) (*Post, error)
+	// Persist the provided post inthe BlogService_SaveBlogPost_params argument to any persistent
+	// storage.
 	SaveBlogPost(context.Context, *BlogService_SaveBlogPost_Params) (*BlogService_SaveBlogPost_Response, error)
+	// Destructive! Removes a blog post from any persistent storage in the internal service.
 	DeleteBlogPost(context.Context, *BlogService_DeleteBlogPost_Params) (*BlogService_DeleteBlogPost_Response, error)
+	// Gets the specific blog post identified by the argument passed to the GetBlogPost from the persistent storage.
+	GetBlogPost(context.Context, *BlogService_GetBlogPost_Params) (*Post, error)
+	// Creates a new comment for the target uuid provided as an argument. Like NewBlogPost this does
+	// not totally save the new comment to any storage.
 	NewComment(context.Context, *BlogService_NewComment_Params) (*Comment, error)
+	// Commits the comment passed as an argument to the BlogService_SaveComment_Params to any persistent storage.
 	SaveComment(context.Context, *BlogService_SaveComment_Params) (*BlogService_SaveComment_Response, error)
+	// Destructive! Removes the comment from any persistence storage in thte internal service. (Sounds similar to the DeleteBlogPost!)
 	DeleteComment(context.Context, *BlogService_DeleteComment_Params) (*BlogService_DeleteComment_Response, error)
-	ReplyToComment(context.Context, *BlogService_ReplyToComment_Params) (*BlogService_ReplyToComment_Response, error)
 	mustEmbedUnimplementedBlogServiceServer()
 }
 
@@ -129,6 +151,9 @@ func (UnimplementedBlogServiceServer) SaveBlogPost(context.Context, *BlogService
 func (UnimplementedBlogServiceServer) DeleteBlogPost(context.Context, *BlogService_DeleteBlogPost_Params) (*BlogService_DeleteBlogPost_Response, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteBlogPost not implemented")
 }
+func (UnimplementedBlogServiceServer) GetBlogPost(context.Context, *BlogService_GetBlogPost_Params) (*Post, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetBlogPost not implemented")
+}
 func (UnimplementedBlogServiceServer) NewComment(context.Context, *BlogService_NewComment_Params) (*Comment, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method NewComment not implemented")
 }
@@ -137,9 +162,6 @@ func (UnimplementedBlogServiceServer) SaveComment(context.Context, *BlogService_
 }
 func (UnimplementedBlogServiceServer) DeleteComment(context.Context, *BlogService_DeleteComment_Params) (*BlogService_DeleteComment_Response, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteComment not implemented")
-}
-func (UnimplementedBlogServiceServer) ReplyToComment(context.Context, *BlogService_ReplyToComment_Params) (*BlogService_ReplyToComment_Response, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ReplyToComment not implemented")
 }
 func (UnimplementedBlogServiceServer) mustEmbedUnimplementedBlogServiceServer() {}
 
@@ -208,6 +230,24 @@ func _BlogService_DeleteBlogPost_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
+func _BlogService_GetBlogPost_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(BlogService_GetBlogPost_Params)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BlogServiceServer).GetBlogPost(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/blogs.BlogService/GetBlogPost",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BlogServiceServer).GetBlogPost(ctx, req.(*BlogService_GetBlogPost_Params))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _BlogService_NewComment_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(BlogService_NewComment_Params)
 	if err := dec(in); err != nil {
@@ -262,24 +302,6 @@ func _BlogService_DeleteComment_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
-func _BlogService_ReplyToComment_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(BlogService_ReplyToComment_Params)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(BlogServiceServer).ReplyToComment(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/blogs.BlogService/ReplyToComment",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(BlogServiceServer).ReplyToComment(ctx, req.(*BlogService_ReplyToComment_Params))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 // BlogService_ServiceDesc is the grpc.ServiceDesc for BlogService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -300,6 +322,10 @@ var BlogService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _BlogService_DeleteBlogPost_Handler,
 		},
 		{
+			MethodName: "GetBlogPost",
+			Handler:    _BlogService_GetBlogPost_Handler,
+		},
+		{
 			MethodName: "NewComment",
 			Handler:    _BlogService_NewComment_Handler,
 		},
@@ -310,10 +336,6 @@ var BlogService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteComment",
 			Handler:    _BlogService_DeleteComment_Handler,
-		},
-		{
-			MethodName: "ReplyToComment",
-			Handler:    _BlogService_ReplyToComment_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -26,9 +26,9 @@ func startTestServer(service interface{}) {
 	grpcServer := grpc.NewServer()
 
 	switch S := service.(type) {
-	case *endpoint.B:
+	case *endpoint.BlogService:
 		pb.RegisterBlogServiceServer(grpcServer, S)
-	case *endpoint.U:
+	case *endpoint.UserService:
 		pb.RegisterUserServiceServer(grpcServer, S)
 	}
 

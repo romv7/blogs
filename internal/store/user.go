@@ -9,6 +9,10 @@ import (
 	"github.com/romv7/blogs/internal/utils/author"
 )
 
+// Only applicable for users that are recognized as pb.USER_T_AUTHOR,
+// returns the metadata of the author stored in a storage. Take note,
+// this method will panic when the User field (u.s) selects an
+// invalid storage driver.
 func (u *User) Metadata() *author.AuthorInfo {
 	if u.Proto().Type != pb.User_T_AUTHOR {
 		return nil
