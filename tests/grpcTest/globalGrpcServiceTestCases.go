@@ -35,7 +35,7 @@ var (
 				"user": map[string]any{
 					"email":     "user2@gmail.com",
 					"full_name": "Christian C. Balunso",
-					"name":      "username123",
+					"name":      "username001",
 					"type":      pb.User_T_AUTHOR,
 				},
 
@@ -67,7 +67,7 @@ var (
 				"user": map[string]any{
 					"email":     "user1@gmail.com",
 					"full_name": "John Mayer",
-					"name":      "username123",
+					"name":      "username32",
 					"type":      pb.User_T_AUTHOR,
 				},
 
@@ -99,7 +99,7 @@ var (
 				"user": map[string]any{
 					"email":     "user1@gmail.com",
 					"full_name": "John Mayer",
-					"name":      "username123",
+					"name":      "username54",
 					"type":      pb.User_T_AUTHOR,
 				},
 
@@ -150,7 +150,7 @@ var (
 				"user": map[string]any{
 					"email":     "user1@gmail.com",
 					"full_name": "John Mayer",
-					"name":      "username123",
+					"name":      "username13",
 					"type":      pb.User_T_AUTHOR,
 				},
 
@@ -202,7 +202,7 @@ var (
 				"user": map[string]any{
 					"email":     "user3@gmail.com",
 					"full_name": "Peter D. Balana",
-					"name":      "username123",
+					"name":      "username1236",
 					"type":      pb.User_T_AUTHOR,
 				},
 

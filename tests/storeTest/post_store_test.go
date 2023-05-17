@@ -45,7 +45,6 @@ func TestPostStore_SqlStore(t *testing.T) {
 			}
 
 			defer p.Delete()
-
 		}
 	}
 

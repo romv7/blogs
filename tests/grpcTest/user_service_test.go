@@ -86,7 +86,7 @@ func TestSaveUser(t *testing.T) {
 		// the saved record from the store.
 		ustore := store.NewUserStore(store.SqlStore)
 
-		defer ustore.Delete(ustore.NewUser(u))
+		defer ustore.NewUser(u).Delete()
 
 		if _, err := ustore.GetByUuid(u.Uuid); errors.Is(err, gorm.ErrRecordNotFound) {
 			t.Errorf("client.Save did not properly saved the record to the database")

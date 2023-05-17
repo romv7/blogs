@@ -1,2 +1,1 @@
-config.toml
-internal/pb/*.go
+./internal/pb/*.go
