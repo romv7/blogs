@@ -19,9 +19,13 @@ test:
 	@$(MAKE) cleanTest && go test -v ./tests/authorHelperTest/... -run ${TEST_RUN}
 	@$(MAKE) cleanTest && go test -v ./tests/storeTest/... -run ${TEST_RUN}
 	@$(MAKE) cleanTest && go test -v ./tests/storageTest/... -run ${TEST_RUN}
+	@$(MAKE) cleanTest && go test -v ./tests/utilsTest/... -run ${TEST_RUN}
 
 grpcTest:
 	@$(MAKE) cleanTest && go test -v ./tests/grpcTest/... -run ${TEST_RUN}
 
 gqlTest:
 	@$(MAKE) cleanTest && go test -v ./tests/gqlTest/... -run ${TEST_RUN}
+
+allTest:
+	@${MAKE} cleanTest && go test -v ./tests/...

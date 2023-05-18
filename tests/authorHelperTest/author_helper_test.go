@@ -14,7 +14,7 @@ import (
 
 var (
 	mockUser = store.NewUserStore(store.SqlStore).NewUser(&pb.User{
-		Id:       utils.RandomUniqueId() + uint64(time.Now().Unix()),
+		Id:       utils.RandomUniqueId() + uint64(time.Now().UTC().Unix()),
 		Uuid:     uuid.NewString(),
 		Name:     "rom123",
 		FullName: "Rom Vales Villanueva",

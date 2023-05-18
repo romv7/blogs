@@ -49,7 +49,6 @@ func (p *Post) Proto() *pb.Post {
 					if err == nil {
 						pout.HeadlineText = m.HeadlineText
 						pout.SummaryText = m.SummaryText
-						pout.Images = m.Images
 						pout.Refs = m.References
 						pout.Content = content
 					} else if os.IsNotExist(err) {

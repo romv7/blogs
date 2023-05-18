@@ -13,5 +13,5 @@ func RandomUniqueId() uint64 {
 		log.Panic(err)
 	}
 
-	return uint64(time.Now().UnixMilli()) - uint64(n.Int64())
+	return uint64(time.Now().UTC().UnixMilli()) - uint64(n.Int64())
 }

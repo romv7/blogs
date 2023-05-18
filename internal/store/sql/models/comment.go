@@ -26,8 +26,8 @@ func NewComment(c *pb.Comment, t_uuid string) (*Comment, error) {
 		ID:         c.Id,
 		Uuid:       c.Uuid,
 		UserId:     c.User.Id,
-		CreatedAt:  c.State.CreatedAt.AsTime(),
-		EditedAt:   c.State.EditedAt.AsTime(),
+		CreatedAt:  c.State.CreatedAt.AsTime().UTC(),
+		EditedAt:   c.State.EditedAt.AsTime().UTC(),
 		TargetUuid: t_uuid,
 		TargetType: c.TargetType,
 	}

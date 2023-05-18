@@ -52,7 +52,6 @@ type AuthorBlogMetadata struct {
 	HeadlineText string `toml:"headline_text"`
 	SummaryText  string `toml:"summary_text"`
 
-	Images      []string `toml:"images"`
 	Attachments []string `toml:"attachments"`
 	References  []string `toml:"references"`
 }
@@ -160,7 +159,6 @@ func (ah *AuthorHelper) SaveAuthorPost(p *pb.Post) error {
 		p.Uuid,
 		p.HeadlineText,
 		p.SummaryText,
-		p.Images,
 		p.Attachments,
 		p.Refs,
 	}
@@ -180,7 +178,7 @@ func (ah *AuthorHelper) SaveAuthorPost(p *pb.Post) error {
 	zw := gzip.NewWriter(out)
 	zw.Name = p.Uuid
 	zw.Comment = p.HeadlineText
-	zw.ModTime = p.State.CreatedAt.AsTime()
+	zw.ModTime = p.State.CreatedAt.AsTime().UTC()
 
 	if _, err := zw.Write(P); err != nil {
 		log.Panic(err)

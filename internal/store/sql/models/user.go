@@ -31,8 +31,8 @@ func NewUser(u *pb.User) (uout *User) {
 		u.Type,
 		u.State.Disabled,
 		u.State.UVerified,
-		u.State.CreatedAt.AsTime(),
-		u.State.UpdatedAt.AsTime(),
+		u.State.CreatedAt.AsTime().UTC(),
+		u.State.UpdatedAt.AsTime().UTC(),
 	}
 
 	return

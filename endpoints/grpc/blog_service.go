@@ -27,7 +27,6 @@ func (svc *BlogService) NewBlogPost(ctx context.Context, params *pb.BlogService_
 	out.HeadlineText = params.HeadlineText
 	out.SummaryText = params.SummaryText
 	out.Tags = &pb.Tags{Data: params.Tags}
-	out.Images = params.Images
 	out.Attachments = params.Attachments
 	out.Refs = params.Refs
 	out.Content = params.Content

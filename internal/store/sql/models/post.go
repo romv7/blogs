@@ -28,7 +28,6 @@ type Post struct {
 	SummaryText  string   `gorm:"-"`
 	Attachments  []string `gorm:"-"`
 	Refs         []string `gorm:"-"`
-	Images       []string `gorm:"-"`
 }
 
 func NewPost(p *pb.Post) (out *Post) {
@@ -51,14 +50,13 @@ func NewPost(p *pb.Post) (out *Post) {
 		Stage:        p.State.Stage,
 		HeadlineText: p.HeadlineText,
 		SummaryText:  p.SummaryText,
-		Images:       p.Images,
 		Refs:         p.Refs,
 		Attachments:  p.Attachments,
 		Status:       p.State.Status,
-		RevisedAt:    p.State.RevisedAt.AsTime(),
-		ArchivedAt:   p.State.ArchivedAt.AsTime(),
-		PublishedAt:  p.State.PublishedAt.AsTime(),
-		CreatedAt:    p.State.CreatedAt.AsTime(),
+		RevisedAt:    p.State.RevisedAt.AsTime().UTC(),
+		ArchivedAt:   p.State.ArchivedAt.AsTime().UTC(),
+		PublishedAt:  p.State.PublishedAt.AsTime().UTC(),
+		CreatedAt:    p.State.CreatedAt.AsTime().UTC(),
 	}
 
 	if p.Prev != nil {
@@ -79,7 +77,6 @@ func (p *Post) Proto() (out *pb.Post) {
 		Uuid:         p.Uuid,
 		HeadlineText: p.HeadlineText,
 		SummaryText:  p.SummaryText,
-		Images:       p.Images,
 		Attachments:  p.Attachments,
 		State: &pb.PostState{
 			Stage:  p.Stage,
