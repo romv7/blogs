@@ -268,5 +268,5 @@ func AuthorRootResourceId(u *pb.User) string {
 		uuidSum += uint64(p)
 	}
 
-	return fmt.Sprintf("%d/%s", (uuidSum+u.Id)%NMAX_AUTHOR_PARTITIONS, u.Name)
+	return fmt.Sprintf("%d/%s", (uuidSum+u.Id)%NMAX_AUTHOR_PARTITIONS, u.Uuid)
 }

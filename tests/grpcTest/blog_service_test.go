@@ -476,6 +476,8 @@ func TestDeleteComment(t *testing.T) {
 			t.Error(err)
 		}
 
+		defer tu.Delete()
+
 		var params *pb.BlogService_NewComment_Params
 
 		switch target.For {
