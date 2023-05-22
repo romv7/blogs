@@ -3,7 +3,6 @@ package store
 import (
 	"errors"
 	"log"
-	"os"
 
 	"github.com/romv7/blogs/internal/pb"
 	"github.com/romv7/blogs/internal/storage"
@@ -18,62 +17,6 @@ type Post struct {
 	t        StoreType
 	s        storage.StorageDriverType
 	sqlModel *sqlModels.Post
-}
-
-func (p *Post) Proto() *pb.Post {
-	ustore := NewUserStore(SqlStore)
-	cstore := NewCommentStore(SqlStore)
-
-	var pout *pb.Post
-
-	switch p.t {
-	case SqlStore:
-		pout = p.sqlModel.Proto()
-
-		if u, err := ustore.GetById(p.sqlModel.UserId); errors.Is(err, gorm.ErrRecordNotFound) {
-			// TODO: Handle post that has no owner.
-		} else {
-			pout.User = u.Proto()
-
-			if pout.User.Type == pb.User_T_AUTHOR {
-				ah := author.NewAuthorHelper(pout.User, p.s)
-
-				// TODO: Get post metadata from the p.s storage.
-				switch p.s {
-				case storage.Plain:
-					m, content, err := ah.GetAuthorPostMetadata(pout)
-
-					var Err error
-
-					// The post still isn't save in the storage.
-					if err == nil {
-						pout.HeadlineText = m.HeadlineText
-						pout.SummaryText = m.SummaryText
-						pout.Refs = m.References
-						pout.Content = content
-					} else if os.IsNotExist(err) {
-						Err = ah.SaveAuthorPost(pout)
-					} else {
-						Err = err
-					}
-
-					if Err != nil {
-						log.Panic(Err)
-					}
-				default:
-					log.Panic(storage.ErrorInvalidStorageDriver)
-				}
-			}
-		}
-
-		pout.Comments = cstore.TargetCommentProtoTree(pout.Uuid)
-
-		return pout
-	default:
-		log.Panic(ErrInvalidStore)
-	}
-
-	return nil
 }
 
 type PostStore struct {
@@ -160,6 +103,10 @@ func (s *PostStore) GetById(id uint64) (out *Post, err error) {
 		if res := db.First(out.sqlModel); errors.Is(res.Error, gorm.ErrRecordNotFound) {
 			return nil, res.Error
 		}
+
+		if out.sqlModel.ID != id {
+			return nil, gorm.ErrRecordNotFound
+		}
 	default:
 		log.Panic(ErrInvalidStore)
 	}
@@ -177,6 +124,10 @@ func (s *PostStore) GetByUuid(uuid string) (out *Post, err error) {
 		out.sqlModel = &sqlModels.Post{}
 		if res := db.Where("uuid = ?", uuid).Limit(1).Find(out.sqlModel); errors.Is(res.Error, gorm.ErrRecordNotFound) {
 			return nil, res.Error
+		}
+
+		if out.sqlModel.Uuid != uuid {
+			return nil, gorm.ErrRecordNotFound
 		}
 	default:
 		log.Panic(ErrInvalidStore)

@@ -9,12 +9,38 @@ import (
 	"github.com/romv7/blogs/internal/utils/author"
 )
 
+func (u *User) Proto() (out *pb.User) {
+	var isAuthor bool
+
+	switch u.t {
+	case SqlStore:
+		out = u.sqlModel.Proto()
+		isAuthor = out.Type == pb.User_T_AUTHOR
+	default:
+		log.Panic(ErrInvalidStore)
+	}
+
+	if isAuthor {
+		out.StoragePath = author.AuthorRootResourceId(out)
+		ah := author.NewAuthorHelper(out, storage.Plain)
+		metadata := ah.GetAuthorMetadata()
+
+		out.Bio = metadata.Bio
+		out.AltName = metadata.AltName
+		for plat, links := range metadata.SocialLinks {
+			out.SocialLinks[string(plat)] = &pb.SocialLinks{Data: links}
+		}
+	}
+
+	return
+}
+
 // Only applicable for users that are recognized as pb.USER_T_AUTHOR,
 // returns the metadata of the author stored in a storage. Take note,
 // this method will panic when the User field (u.s) selects an
 // invalid storage driver.
 func (u *User) Metadata() *author.AuthorInfo {
-	if u.Proto().Type != pb.User_T_AUTHOR {
+	if !u.IsAuthor() {
 		return nil
 	}
 

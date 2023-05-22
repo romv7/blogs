@@ -1,0 +1,20 @@
+# This is the entrypoint/root for all of our defined schemas on the separate schemas folder.
+
+type Query {
+  
+  # Used to search for a specific entity on the entire data source. If no results were found by
+  # the query.
+  globalSearch(keyword: String): SearchResults!
+
+}
+
+type Mutation {
+
+  # superOps are the group of operations that must be rate limited, these are also
+  # the most vulnerable commands exposed in the server, as it can modify restricted resources.
+  superOps: SuperMutations!
+
+  # Mutations related to users are defined in this type. We shuold consider adding a rate limiting
+  # features to this as it can be abused by anyone.
+  userOps: UserMutations!
+}

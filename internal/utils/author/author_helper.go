@@ -38,11 +38,11 @@ type AuthorHelper struct {
 type AuthorInfo struct {
 	Bio         string                                `toml:"bio"`
 	AltName     string                                `toml:"alt_name"`
-	Stats       *authorStats                          `toml:"stats"`
+	Stats       *AuthorStats                          `toml:"stats"`
 	SocialLinks map[constants.SocialLinkType][]string `toml:"social_links"`
 }
 
-type authorStats struct {
+type AuthorStats struct {
 	Subscriptions []string `toml:"subscriptions"`
 }
 
@@ -78,7 +78,7 @@ func NewAuthorHelper(u *pb.User, s storage.StorageDriverType) (out *AuthorHelper
 	if !out.storage.Contains(authorInfoFileKey) {
 
 		out.authorInfo = &AuthorInfo{
-			Stats:       &authorStats{},
+			Stats:       &AuthorStats{},
 			SocialLinks: map[constants.SocialLinkType][]string{},
 		}
 

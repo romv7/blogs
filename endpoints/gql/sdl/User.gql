@@ -1,0 +1,47 @@
+
+type User {
+
+  #
+  id: Float!
+
+  #
+  uuid: String!
+
+  #
+  name: String!
+
+  #
+  fullName: String!
+
+  #
+  email: String!
+
+  #
+  type: UserType!
+
+  #
+  createdAt: Time!
+
+  #
+  updatedAt: Time!
+
+  #
+  isDisabled: Boolean!
+
+  #
+  isVerified: Boolean!
+}
+
+input UserSuperMutationsParameter {
+  id: Float
+  name: String
+  fullName: String
+  email: String
+  isDisabled: Boolean
+  isVerified: Boolean
+  type: UserType
+
+  bio: String
+  altName: String
+}
+

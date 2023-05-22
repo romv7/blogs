@@ -55,28 +55,6 @@ type Comment struct {
 	sqlModel *sqlModels.Comment
 }
 
-func (c *Comment) Proto() (out *pb.Comment) {
-	cstore := NewCommentStore(SqlStore)
-	ustore := NewUserStore(SqlStore)
-
-	switch c.t {
-	case SqlStore:
-		out = c.sqlModel.Proto()
-		out.Replies = cstore.TargetCommentProtoTree(out.Uuid)
-
-		if u, err := ustore.GetById(c.sqlModel.UserId); err != nil {
-			// TODO: Handle comment that has no owner
-		} else {
-			out.User = u.Proto()
-		}
-
-	default:
-		log.Panic(ErrInvalidStore)
-	}
-
-	return
-}
-
 type CommentStore struct {
 	t StoreType
 	s storage.StorageDriverType
@@ -101,7 +79,7 @@ func (s *CommentStore) NewComment(c *pb.Comment, t_uuid string, T pb.Comment_Tar
 	out = &Comment{}
 
 	if s.t == SqlStore {
-		if err := setTheTargetFor(c, t_uuid, T); err != nil {
+		if err := setTheTargetFor(c, t_uuid, T); err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 			log.Panic(err)
 		}
 
@@ -160,6 +138,10 @@ func (s *CommentStore) GetById(id uint64) (out *Comment, err error) {
 		if res := db.First(out.sqlModel); errors.Is(res.Error, gorm.ErrRecordNotFound) {
 			return nil, res.Error
 		}
+
+		if out.sqlModel.ID != id {
+			return nil, gorm.ErrRecordNotFound
+		}
 	default:
 		log.Panic(ErrInvalidStore)
 	}
@@ -179,6 +161,9 @@ func (s *CommentStore) GetByUuid(uuid string) (out *Comment, err error) {
 			return nil, res.Error
 		}
 
+		if out.sqlModel.Uuid != uuid {
+			return nil, gorm.ErrRecordNotFound
+		}
 	default:
 		log.Panic(ErrInvalidStore)
 	}

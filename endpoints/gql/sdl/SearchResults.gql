@@ -1,0 +1,16 @@
+
+type SearchResultsStats {
+  peopleCount: Float!
+  postsCount: Float!
+  commentsCount: Float!
+}
+
+type SearchResults {
+  keyword: String!
+  people: [User!]!
+  posts: [Post!]!
+  comments: [Comment!]!
+  stats: SearchResultsStats!
+  startTime: Time!
+  endTime: Time!
+}

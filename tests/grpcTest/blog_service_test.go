@@ -40,7 +40,7 @@ func saveUser(au map[string]any) (u *store.User, err error) {
 	return
 }
 
-func TestNewBlogPost(t *testing.T) {
+func TestGrpcNewBlogPost(t *testing.T) {
 	b := &endpoint.BlogService{}
 
 	startTestServer(b)
@@ -98,7 +98,7 @@ func TestNewBlogPost(t *testing.T) {
 
 }
 
-func TestSaveBlogPost(t *testing.T) {
+func TestGrpcSaveBlogPost(t *testing.T) {
 	b := &endpoint.BlogService{}
 
 	startTestServer(b)
@@ -163,7 +163,7 @@ func TestSaveBlogPost(t *testing.T) {
 
 }
 
-func TestDeleteBlogPost(t *testing.T) {
+func TestGrpcDeleteBlogPost(t *testing.T) {
 	b := &endpoint.BlogService{}
 
 	startTestServer(b)
@@ -228,7 +228,7 @@ func TestDeleteBlogPost(t *testing.T) {
 
 }
 
-func TestGetBlogPost(t *testing.T) {
+func TestGrpcGetBlogPost(t *testing.T) {
 	b := &endpoint.BlogService{}
 
 	startTestServer(b)
@@ -256,7 +256,7 @@ func getRandomGlobalGrpcTestIndex() uint64 {
 	return utils.RandomUniqueId() % uint64(len(globalTestCases))
 }
 
-func TestNewComment(t *testing.T) {
+func TestGrpcNewComment(t *testing.T) {
 	b := &endpoint.BlogService{}
 
 	startTestServer(b)
@@ -345,7 +345,7 @@ func TestNewComment(t *testing.T) {
 	}
 }
 
-func TestSaveComment(t *testing.T) {
+func TestGrpcSaveComment(t *testing.T) {
 	b := &endpoint.BlogService{}
 
 	startTestServer(b)
@@ -355,6 +355,9 @@ func TestSaveComment(t *testing.T) {
 	defer conn.Close()
 
 	pstore := store.NewPostStore(store.SqlStore)
+
+	// For cleanup remaining comments
+	cstore := store.NewCommentStore(store.SqlStore)
 
 	for _, tcase := range globalTestCases {
 		if tcase.For != BlogServiceTest_Comment {
@@ -432,11 +435,15 @@ func TestSaveComment(t *testing.T) {
 			t.Error(err)
 		}
 
+		if err := cstore.NewComment(c, params.TargetUuid, params.TargetType).Delete(); err != nil {
+			t.Error(err)
+		}
+
 	}
 
 }
 
-func TestDeleteComment(t *testing.T) {
+func TestGrpcDeleteComment(t *testing.T) {
 	b := &endpoint.BlogService{}
 
 	startTestServer(b)

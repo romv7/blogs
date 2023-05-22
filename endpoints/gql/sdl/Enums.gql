@@ -1,0 +1,44 @@
+# Each enumeration values are mapped from the gRPC enums that I have defined (separated from this package).
+# If you got something an enum values to add, you can add it here. You can view the documentation
+# for each of this enumeration types on the proto files that I had made.
+
+enum PostStage {
+  S_WIP
+  S_REVIEW
+  S_PUB
+  S_REV
+}
+
+enum PostStatus {
+  S_DRAFT
+  S_ARCHIVED
+  S_TRASH
+  S_VISIBLE
+  S_HIDDEN
+}
+
+enum CommentTargetType {
+  TT_USER
+  TT_COMMENT
+  TT_POST
+}
+
+enum UserType {
+  T_NORMAL
+  T_AUTHOR
+}
+
+enum SuperOpsType {
+  SO_NEW
+  SO_UPDATE
+  SO_DELETE
+}
+
+enum UserOpsType {
+  UO_CREATE_POST
+  UO_UPDATE_POST
+  UO_DELETE_POST
+  UO_CREATE_COMMENT
+  UO_UPDATE_COMMNET
+  UO_DELETE_COMMENT
+}

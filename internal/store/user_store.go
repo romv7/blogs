@@ -8,6 +8,7 @@ import (
 	"github.com/romv7/blogs/internal/storage"
 	sqlStore "github.com/romv7/blogs/internal/store/sql"
 	sqlModels "github.com/romv7/blogs/internal/store/sql/models"
+	"github.com/romv7/blogs/internal/utils/author"
 
 	"gorm.io/gorm"
 )
@@ -16,18 +17,6 @@ type User struct {
 	t        StoreType
 	s        storage.StorageDriverType
 	sqlModel *sqlModels.User
-}
-
-func (u *User) Proto() *pb.User {
-
-	switch u.t {
-	case SqlStore:
-		return u.sqlModel.Proto()
-	default:
-		log.Panic(ErrInvalidStore)
-	}
-
-	return nil
 }
 
 type UserStore struct {
@@ -64,6 +53,26 @@ func (s *UserStore) NewUser(u *pb.User) (out *User) {
 	// Set the storage type
 	out.s = s.s
 
+	// Populates the metadata of an author user using the stored metadata
+	// from a storage.
+	pbuser := out.Proto()
+
+	if pbuser.Type == pb.User_T_AUTHOR {
+		ah := author.NewAuthorHelper(pbuser, storage.Plain)
+		metadata := ah.GetAuthorMetadata()
+
+		if metadata == nil {
+			return
+		}
+
+		pbuser.Bio = metadata.Bio
+		pbuser.AltName = metadata.AltName
+
+		for plat, links := range metadata.SocialLinks {
+			pbuser.SocialLinks[string(plat)] = &pb.SocialLinks{Data: links}
+		}
+	}
+
 	return
 }
 
@@ -78,11 +87,18 @@ func (s *UserStore) Save(u *User) (err error) {
 		log.Panic(ErrInvalidStore)
 	}
 
+	// Saves the user metadata (if any) to the storage.
+	pbuser := u.Proto()
+
+	if pbuser.Type == pb.User_T_AUTHOR {
+		ah := author.NewAuthorHelper(pbuser, storage.Plain)
+		ah.SaveAuthorMetadata()
+	}
+
 	return
 }
 
 func (s *UserStore) Delete(u *User) (err error) {
-
 	switch s.t {
 	case SqlStore:
 		db := sqlStore.Store()
@@ -122,6 +138,9 @@ func (s *UserStore) GetById(id uint64) (out *User, err error) {
 			return nil, res.Error
 		}
 
+		if out.sqlModel.ID != id {
+			return nil, gorm.ErrRecordNotFound
+		}
 	default:
 		log.Panic(ErrInvalidStore)
 	}
@@ -142,6 +161,9 @@ func (s *UserStore) GetByUuid(uuid string) (out *User, err error) {
 			return nil, res.Error
 		}
 
+		if out.sqlModel.Uuid != uuid {
+			return nil, gorm.ErrRecordNotFound
+		}
 	default:
 		log.Panic(ErrInvalidStore)
 	}

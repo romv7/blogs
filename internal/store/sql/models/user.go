@@ -3,6 +3,7 @@ package models
 import (
 	"time"
 
+	"github.com/romv7/blogs/internal/constants"
 	"github.com/romv7/blogs/internal/pb"
 	"github.com/romv7/blogs/internal/utils/author"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -19,20 +20,25 @@ type User struct {
 	Verified  bool         `gorm:"column:is_verified"`
 	CreatedAt time.Time    `gorm:"column:created_at"`
 	UpdatedAt time.Time    `gorm:"column:updated_at"`
+
+	Bio         string                                `gorm:"-"`
+	AltName     string                                `gorm:"-"`
+	Stats       *author.AuthorStats                   `gorm:"-"`
+	SocialLinks map[constants.SocialLinkType][]string `gorm:"-"`
 }
 
 func NewUser(u *pb.User) (uout *User) {
 	uout = &User{
-		u.Id,
-		u.Uuid,
-		u.Name,
-		u.FullName,
-		u.Email,
-		u.Type,
-		u.State.Disabled,
-		u.State.UVerified,
-		u.State.CreatedAt.AsTime().UTC(),
-		u.State.UpdatedAt.AsTime().UTC(),
+		ID:        u.Id,
+		Uuid:      u.Uuid,
+		Name:      u.Name,
+		FullName:  u.FullName,
+		Email:     u.Email,
+		Type:      u.Type,
+		Disabled:  u.State.Disabled,
+		Verified:  u.State.UVerified,
+		CreatedAt: u.State.CreatedAt.AsTime().UTC(),
+		UpdatedAt: u.State.UpdatedAt.AsTime().UTC(),
 	}
 
 	return
@@ -52,10 +58,6 @@ func (u *User) Proto() (out *pb.User) {
 			Disabled:  u.Disabled,
 			UVerified: u.Verified,
 		},
-	}
-
-	if out.Type == pb.User_T_AUTHOR {
-		out.StoragePath = author.AuthorRootResourceId(out)
 	}
 
 	return

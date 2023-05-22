@@ -1,0 +1,22 @@
+
+# NOTE: If you want to add a new social link to this object, you must also
+# update the constants.SocialLinkType enum defined in the `internal/constants`
+# package.
+type SocialLinks {
+  S_MASTODON: String
+  S_FACEBOOK: String
+  S_TWITTER: String
+  S_REDDIT: String
+  S_ARTSTATION: String
+  S_YOUTUBE: String
+  S_INSTAGRAM: String
+  S_LINKEDIN: String
+  S_DRIBBBLE: String
+  S_DEVIANTART: String
+  S_STEAM: String
+  S_QUORA: String
+  S_TWITCH: String
+  S_DISCORD: String
+}
+
+

@@ -1,0 +1,42 @@
+
+type UserOpsResults {
+  op: UserOpsType!
+
+  message: String
+  code: Int
+
+  startTime: Time!
+  endTime: Time!
+
+  uuid: String!
+}
+
+
+# Despite its name some of the operations defined here are only available for
+# users of type "T_AUTHOR", hence it should results to an error when a normal
+# user attempts to create a new post.
+type UserMutations {
+
+  # Creates a new post using the provided data as an argument and persist it to
+  # a data source.
+  createPost(input: UserOpsPostMutationsParameter!): UserOpsResults!
+
+  # Updates an existing post metadata using the provided arguments. If a post
+  # does not exist it must return an error.
+  updatePost(input: UserOpsPostMutationsParameter!): UserOpsResults!
+
+  # Deletes a post stored somewhere in the data source, using the arguments provided.
+  deletePost(uuid: String!): UserOpsResults!
+
+  # Creates a comment targeting an entity. If provided with an arguments that are not
+  # a valid entity error must be thrown.
+  createComment(input: UserOpsCommentMutationsParameter!): UserOpsResults!
+
+  # Updates an existing comment of a user in the data source.
+  updateComment(input: UserOpsCommentMutationsParameter!): UserOpsResults!
+
+  # Deletes a comment by a user stored somewhere in the data source.
+  deleteComment(uuid: String!): UserOpsResults!
+
+}
+

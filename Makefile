@@ -28,4 +28,4 @@ gqlTest:
 	@$(MAKE) cleanTest && go test -v ./tests/gqlTest/... -run ${TEST_RUN}
 
 allTest:
-	@${MAKE} cleanTest && go test -v ./tests/...
+	@${MAKE} cleanTest && go test -v ./tests/... -run ${TEST_RUN}

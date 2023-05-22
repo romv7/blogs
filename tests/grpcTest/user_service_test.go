@@ -11,7 +11,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func TestNewUser(t *testing.T) {
+func TestGrpcNewUser(t *testing.T) {
 	u := &endpoint.UserService{}
 
 	startTestServer(u)
@@ -49,7 +49,7 @@ func TestNewUser(t *testing.T) {
 
 }
 
-func TestSaveUser(t *testing.T) {
+func TestGrpcSaveUser(t *testing.T) {
 	u := &endpoint.UserService{}
 
 	startTestServer(u)
@@ -94,7 +94,7 @@ func TestSaveUser(t *testing.T) {
 	}
 }
 
-func TestDeleteUser(t *testing.T) {
+func TestGrpcDeleteUser(t *testing.T) {
 	u := &endpoint.UserService{}
 
 	startTestServer(u)

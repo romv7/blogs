@@ -1,0 +1,38 @@
+
+# CommentTarget is the target entity of the comment, it is determined by the
+# `target_uuid` which is stored in a data source.
+# union CommentTarget = Post | Comment | User
+
+# Comment is a message by a user for a specific entity. An entity could be one
+# of the mentioned target aboves, it could be a Post, User or a Comment.
+type Comment {
+  #
+  id: Float!
+
+  #
+  uuid: String!
+
+  #
+  user: User!
+
+  #
+  commentText: String!
+
+  #
+  replies: [Comment!]!
+
+  #
+  targetType: CommentTargetType!
+
+  #
+  # target: CommentTarget!
+  
+  #
+  reacts: Reacts!
+}
+
+input UserOpsCommentMutationsParameter {
+  commentText: String!
+  targetUuid: String!
+  targetType: CommentTargetType!
+}

@@ -1,0 +1,10 @@
+
+
+type Reacts {
+  likeCount: Float!
+  confusedCount: Float!
+  loveCount: Float!
+  laughCount: Float!
+  sadCount: Float!
+  careCount: Float!
+}

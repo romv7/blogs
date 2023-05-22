@@ -1,0 +1,66 @@
+
+# Is a type that describes the Post message in the proto file. For more information
+# about this type, you can view the documentation for it on the message definitions.
+type Post {
+  #
+  id: Float!
+  
+  #
+  uuid: String!
+  
+  #
+  headlineText: String!
+  
+  #
+  summaryText: String!
+  
+  #
+  user: User!
+  
+  #
+  comments: [Comment!]!
+  
+  #
+  tags: [String!]!
+  
+  #
+  attachments: [String!]!
+  
+  #
+  refs: [String!]!
+  
+  #
+  content: String!
+  
+  #
+  reacts: Reacts!
+  
+  #
+  stage: PostStage!
+  
+  #
+  status: PostStatus!
+  
+  #
+  createdAt: Time!
+  
+  #
+  revisedAt: Time!
+  
+  #
+  archivedAt: Time
+  
+  #
+  publishedAt: Time
+}
+
+input UserOpsPostMutationsParameter {
+  headlineText: String
+  summaryText: String
+  content: String
+  tags: [String!]
+  attachments: [String!]
+  refs: [String!]
+  stage: Int
+  status: Int
+}

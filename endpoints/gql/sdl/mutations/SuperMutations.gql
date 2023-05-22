@@ -1,0 +1,32 @@
+
+type SuperOpsResults {
+  # Indicates what type of operation was performed by the query.
+  op: SuperOpsType!
+
+  # Optional message is return here. SuperOpsResults also has a `code` field
+  # which helps the consumer what type of error code did it received.
+  message: String
+  code: Int
+
+  # When did the operation start and ended.
+  startTime: Time!
+  endTime: Time!
+
+  # The unique identifier of the resource (i.e. user) we have perfomed the 
+  # operation to.
+  uuid: String!
+}
+
+
+type SuperMutations {
+  
+  # Instantiate a new user in the data source using the provided args.
+  addUser(input: UserSuperMutationsParameter!): SuperOpsResults!
+
+  # Mutates an update the fields of a user and pushes it into the data source.
+  updateUser(input: UserSuperMutationsParameter!): SuperOpsResults!
+
+  # Deletes the record of a user passed as an argument on the data source.
+  deleteUser(uuid: String!): SuperOpsResults!
+
+}
