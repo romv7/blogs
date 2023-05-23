@@ -67,6 +67,8 @@ func (p *Post) Proto() *pb.Post {
 	return nil
 }
 
+// Just another helper method for the PostStore.Save() method. Used this as much as possible instead of
+// directly making a new instance of the PostStore each time you want to save a post to the data source.
 func (p *Post) Save() (err error) {
 	pstore := NewPostStore(p.t)
 
@@ -85,6 +87,8 @@ func (p *Post) Save() (err error) {
 	return
 }
 
+// Just another helper method for the PostStore.Delete() method. Used this as much as possible instead of
+// directly making a new instance of the PostStore each time you want to delete a post to the data source.
 func (p *Post) Delete() (err error) {
 	pstore := NewPostStore(p.t)
 
@@ -100,6 +104,7 @@ func (p *Post) Delete() (err error) {
 	return
 }
 
+// Careful with this method, because it can change who will be the owner of the post.
 func (p *Post) SetOwner(u *User) {
 	switch p.t {
 	case SqlStore:

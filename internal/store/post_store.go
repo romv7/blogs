@@ -92,6 +92,7 @@ func (s *PostStore) Delete(p *Post) (err error) {
 	return
 }
 
+// TODO: Add a documentation to this method.
 func (s *PostStore) GetById(id uint64) (out *Post, err error) {
 	out = &Post{}
 
@@ -114,6 +115,7 @@ func (s *PostStore) GetById(id uint64) (out *Post, err error) {
 	return
 }
 
+// TODO: Add a documentation to this method.
 func (s *PostStore) GetByUuid(uuid string) (out *Post, err error) {
 	out = &Post{}
 

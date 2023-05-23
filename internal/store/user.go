@@ -10,6 +10,9 @@ import (
 )
 
 func (u *User) Proto() (out *pb.User) {
+
+	// This method will not rely on the u.IsAuthor method to determine whether the user is an author or not
+	// because it causes an infinite recursion when we rely on the u.IsAuthor method.
 	var isAuthor bool
 
 	switch u.t {
@@ -77,8 +80,9 @@ func (u *User) Delete() (err error) {
 	return
 }
 
+// Convert a user into a just an author, when the user is already a pb.User_T_AUTHOR do nothing and return the user.
 func (u *User) ToAuthor() *User {
-	if u.Proto().Type == pb.User_T_AUTHOR {
+	if u.IsAuthor() {
 		return u
 	}
 
@@ -92,6 +96,7 @@ func (u *User) ToAuthor() *User {
 	return u
 }
 
+// Convert a user into a just a normal one, when the user is already a pb.User_T_NORMAL do nothing and return the user.
 func (u *User) ToNormal() *User {
 	if u.Proto().Type == pb.User_T_NORMAL {
 		return u
@@ -107,6 +112,10 @@ func (u *User) ToNormal() *User {
 	return u
 }
 
+// TODO: Make a periodically executing code that purges all of the unverified and disabled users from the database.
+
+// Toggles the u.UVerified property of a user. Doing so will verify that the user is a legitimate
+// resource consumer.
 func (u *User) Verify() (err error) {
 
 	switch u.t {
@@ -145,14 +154,12 @@ func (u *User) Enable() (err error) {
 	return
 }
 
+// A simple helper method used for checking whether a user is an author or just a normal user.
 func (u *User) IsAuthor() bool {
-	if u.Proto().Type == pb.User_T_AUTHOR {
-		return true
-	}
-
-	return false
+	return u.Proto().Type == pb.User_T_AUTHOR
 }
 
+// A helper function used for toggling the u.Disabled property of a user.
 func toggleDisabledProperty(u *User, val bool) (err error) {
 	switch u.t {
 	case SqlStore:

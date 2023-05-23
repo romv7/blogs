@@ -6,6 +6,8 @@ import (
 	"github.com/romv7/blogs/internal/pb"
 )
 
+// TODO: Add a documentation to this method.
+// TODO: Should set the c.Target field of the comment using the retrieved target_uuid from the database.
 func (c *Comment) Proto() (out *pb.Comment) {
 	cstore := NewCommentStore(SqlStore)
 	ustore := NewUserStore(SqlStore)
@@ -28,6 +30,8 @@ func (c *Comment) Proto() (out *pb.Comment) {
 	return
 }
 
+// Just another helper method for the CommentStore.Save() method. Used this as much as possible instead of
+// directly making a new instance of the CommentStore each time you want to save a comment to the data source.
 func (c *Comment) Save() (err error) {
 	cstore := NewCommentStore(c.t)
 	err = cstore.Save(c)
@@ -35,6 +39,8 @@ func (c *Comment) Save() (err error) {
 	return
 }
 
+// Just another helper method for the CommentStore.Delete() method. Used this as much as possible instead of
+// directly making a new instance of the CommentStore each time you want to delete a comment to the data source.
 func (c *Comment) Delete() (err error) {
 	cstore := NewCommentStore(c.t)
 	err = cstore.Delete(c)

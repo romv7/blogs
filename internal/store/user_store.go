@@ -125,6 +125,7 @@ func (s *UserStore) Delete(u *User) (err error) {
 //	is apparent that it should return a not found error because the other test already deleted
 //	the record we are trying to lookup with GetById.
 
+// TODO: Add a documentation to this method.
 func (s *UserStore) GetById(id uint64) (out *User, err error) {
 	out = &User{}
 
@@ -148,6 +149,7 @@ func (s *UserStore) GetById(id uint64) (out *User, err error) {
 	return
 }
 
+// TODO: Add a documentation to this method.
 func (s *UserStore) GetByUuid(uuid string) (out *User, err error) {
 	out = &User{}
 

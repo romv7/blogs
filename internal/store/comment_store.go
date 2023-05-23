@@ -14,7 +14,10 @@ import (
 	"gorm.io/gorm"
 )
 
-func setTheTargetFor(c *pb.Comment, t_uuid string, T pb.Comment_TargetType) (err error) {
+// Used for setting the target field of a pb.Comment, useful for situations where the c.Target field
+// must be set instead of leaving the field empty. This utility is expensive and should not be used
+// often.
+func SetTargetForComment(c *pb.Comment, t_uuid string, T pb.Comment_TargetType) (err error) {
 	switch T {
 	case pb.Comment_TT_COMMENT:
 		commentStore := NewCommentStore(SqlStore)
@@ -51,7 +54,6 @@ func setTheTargetFor(c *pb.Comment, t_uuid string, T pb.Comment_TargetType) (err
 
 type Comment struct {
 	t        StoreType
-	s        storage.StorageDriverType
 	sqlModel *sqlModels.Comment
 }
 
@@ -75,11 +77,13 @@ func (s *CommentStore) GetMainStore() (S any) {
 	return
 }
 
+// Converts a pb.Comment into a new Comment that can be used for operations involving the database.
+// This method requires 3 arguments to be invoked.
 func (s *CommentStore) NewComment(c *pb.Comment, t_uuid string, T pb.Comment_TargetType) (out *Comment) {
 	out = &Comment{}
 
 	if s.t == SqlStore {
-		if err := setTheTargetFor(c, t_uuid, T); err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		if err := SetTargetForComment(c, t_uuid, T); err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 			log.Panic(err)
 		}
 
@@ -96,6 +100,8 @@ func (s *CommentStore) NewComment(c *pb.Comment, t_uuid string, T pb.Comment_Tar
 	return
 }
 
+// Saves the comment to a data source. The data source to which the data will be stored
+// will be decided by what type was CommentStore initialized.
 func (s *CommentStore) Save(c *Comment) (err error) {
 	switch s.t {
 	case SqlStore:
@@ -109,6 +115,8 @@ func (s *CommentStore) Save(c *Comment) (err error) {
 	return
 }
 
+// Deletes the comment passed as argument from the data source to which it was possibly stored.
+// Should return an error when it does not found any data related to the comment passed.
 func (s *CommentStore) Delete(c *Comment) (err error) {
 
 	switch s.t {
@@ -127,6 +135,7 @@ func (s *CommentStore) Delete(c *Comment) (err error) {
 	return
 }
 
+// TODO: Add a documentation to this method.
 func (s *CommentStore) GetById(id uint64) (out *Comment, err error) {
 	out = &Comment{}
 
@@ -149,6 +158,7 @@ func (s *CommentStore) GetById(id uint64) (out *Comment, err error) {
 	return
 }
 
+// TODO: Add a documentation to this method.
 func (s *CommentStore) GetByUuid(uuid string) (out *Comment, err error) {
 	out = &Comment{}
 
@@ -171,6 +181,10 @@ func (s *CommentStore) GetByUuid(uuid string) (out *Comment, err error) {
 	return
 }
 
+// TODO: Fill the c.Target field with the associated target to it (based on the uuid passed).
+
+// Constructs a set of pb.Comment for the given target uuid. This should be used with moderation as this
+// method is expensive, it performs a lot of operations on a data source.
 func (s *CommentStore) TargetCommentProtoTree(t_uuid string) (out []*pb.Comment) {
 	out = make([]*pb.Comment, 0)
 	ustore := NewUserStore(SqlStore)
