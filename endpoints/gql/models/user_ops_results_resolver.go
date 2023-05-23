@@ -22,6 +22,10 @@ func (so *GQLModel_UserOpsResultsResolver) Code() *int32 {
 	return &so.res.Code
 }
 
+func (so *GQLModel_UserOpsResultsResolver) Uuid() string {
+	return so.res.Uuid
+}
+
 func (so *GQLModel_UserOpsResultsResolver) StartTime() graphql.Time {
 	return graphql.Time{Time: so.res.StartTime}
 }

@@ -21,9 +21,9 @@ func NewSuperMutations_Resolver() *SuperMutations_Resolver {
 	return &SuperMutations_Resolver{}
 }
 
-type outResolver = *models.GQLModel_SuperOpsResultsResolver
+type superOpsResolver = *models.GQLModel_SuperOpsResultsResolver
 
-func (SuperMutations_Resolver) AddUser(ctx context.Context, args *ArgsAddUser) (outResolver, error) {
+func (SuperMutations_Resolver) AddUser(ctx context.Context, args *ArgsAddUser) (superOpsResolver, error) {
 	var err error
 
 	res := &models.SuperOpsResults{Op: models.SuperOpsType_SO_NEW, StartTime: time.Now()}
@@ -81,7 +81,7 @@ func (SuperMutations_Resolver) AddUser(ctx context.Context, args *ArgsAddUser) (
 	return models.NewGQLModel_SuperOpsResultsResolver(res), nil
 }
 
-func (SuperMutations_Resolver) UpdateUser(ctx context.Context, args *ArgsUpdateUser) (outResolver, error) {
+func (SuperMutations_Resolver) UpdateUser(ctx context.Context, args *ArgsUpdateUser) (superOpsResolver, error) {
 	var err error
 
 	res := &models.SuperOpsResults{Op: models.SuperOpsType_SO_UPDATE, StartTime: time.Now().UTC()}
@@ -176,7 +176,7 @@ func (SuperMutations_Resolver) UpdateUser(ctx context.Context, args *ArgsUpdateU
 	return models.NewGQLModel_SuperOpsResultsResolver(res), nil
 }
 
-func (SuperMutations_Resolver) DeleteUser(ctx context.Context, args *ArgsDeleteUser) (outResolver, error) {
+func (SuperMutations_Resolver) DeleteUser(ctx context.Context, args *ArgsDeleteUser) (superOpsResolver, error) {
 	var err error
 
 	res := &models.SuperOpsResults{Op: models.SuperOpsType_SO_DELETE, StartTime: time.Now().UTC()}

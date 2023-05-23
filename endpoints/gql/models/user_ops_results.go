@@ -28,4 +28,5 @@ type UserOpsResults struct {
 	Code      int32        `json:"code"`
 	StartTime time.Time    `json:"startTime"`
 	EndTime   time.Time    `json:"endTime"`
+	Uuid      string       `json:"uuid"`
 }
