@@ -24,7 +24,6 @@ func NewUserMutations_Resolver() *UserMutations_Resolver {
 type userOpsResolver = *models.GQLModel_UserOpsResultsResolver
 
 func (r *UserMutations_Resolver) CreatePost(ctx context.Context, args *ArgsCreatePost) (userOpsResolver, error) {
-
 	res := &models.UserOpsResults{Op: models.UserOpsType_UO_CREATE_POST, StartTime: time.Now()}
 	defer func() {
 		res.EndTime = time.Now()
@@ -46,13 +45,44 @@ func (r *UserMutations_Resolver) UpdatePost(ctx context.Context, args *ArgsUpdat
 }
 
 func (r *UserMutations_Resolver) DeletePost(ctx context.Context, args *ArgsDeletePost) (userOpsResolver, error) {
-
 	res := &models.UserOpsResults{Op: models.UserOpsType_UO_DELETE_POST, StartTime: time.Now()}
 	defer func() {
 		res.EndTime = time.Now()
 	}()
 
-	return models.NewGQLModel_UserOpsResultsResolver(res), nil
+	if args.Uuid == "" {
+		message := errors.ErrInsufficientArguments.Error()
+		res.Message = &message
+		res.Code = http.StatusBadRequest
+
+		return models.NewGQLModel_UserOpsResultsResolver(res), errors.ErrInsufficientArguments
+	}
+
+	pstore := store.NewPostStore(store.SqlStore)
+
+	var delErr error
+
+	if P, err := pstore.GetByUuid(args.Uuid); err != nil {
+		message := err.Error()
+		res.Message = &message
+		res.Code = http.StatusBadRequest
+
+		return models.NewGQLModel_UserOpsResultsResolver(res), errors.ErrInsufficientArguments
+	} else {
+		delErr = P.Delete()
+	}
+
+	if delErr == nil {
+		message := fmt.Sprintf("deleted post (%s)", args.Uuid)
+		res.Message = &message
+		res.Code = http.StatusNoContent
+	} else {
+		message := delErr.Error()
+		res.Message = &message
+		res.Code = http.StatusBadRequest
+	}
+
+	return models.NewGQLModel_UserOpsResultsResolver(res), delErr
 }
 
 func (r *UserMutations_Resolver) CreateComment(ctx context.Context, args *ArgsCreateComment) (userOpsResolver, error) {

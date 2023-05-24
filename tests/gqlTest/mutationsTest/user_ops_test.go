@@ -20,7 +20,7 @@ func TestUserOpsCreatePost(t *testing.T) {
 	mutation UserOpsForCreatePost($post: UserOpsPostMutationsParameter!) {
 		userOps {
 			createPost(input: $post) {
-
+				
 			}
 		}
 	}
@@ -34,7 +34,7 @@ func TestUserOpsUpdatePost(t *testing.T) {
 	mutation UserOpsForUpdatePost($post: UserOpsPostMutationsParameter!) {
 		userOps {
 			updatePost(input: $post) {
-
+				
 			}
 		}
 	}
@@ -44,17 +44,85 @@ func TestUserOpsUpdatePost(t *testing.T) {
 }
 
 func TestUserOpsDeletePost(t *testing.T) {
-	_ = `
+	S := gql.DefaultSchema()
+	q := `
 	mutation UserOpsForDeletePost($postUuid: String!) {
 		userOps {
 			deletePost(uuid: $postUuid) {
-
+				op
+				code
+				message
+				uuid
 			}
 		}
 	}
 	`
 
-	t.Error("not implemented")
+	owner := &pb.User{
+		Id:       utils.RandomUniqueId(),
+		Uuid:     uuid.NewString(),
+		Name:     "quirkybastard",
+		FullName: "Quirky Bastard",
+		Email:    "quirk@gmail.com",
+		Type:     pb.User_T_AUTHOR,
+		State: &pb.UserState{
+			CreatedAt: timestamppb.Now(),
+			UpdatedAt: timestamppb.Now(),
+			Disabled:  false,
+			UVerified: true,
+		},
+	}
+
+	post := &pb.Post{
+		Id:           utils.RandomUniqueId(),
+		Uuid:         uuid.NewString(),
+		HeadlineText: "Example blog post",
+		SummaryText:  "Just another example blog post for a unit test.",
+		User:         owner,
+		Tags:         &pb.Tags{Data: []string{"example", "test"}},
+		State: &pb.PostState{
+			Stage:       pb.PostState_S_PUB,
+			Status:      pb.PostState_S_VISIBLE,
+			RevisedAt:   nil,
+			ArchivedAt:  nil,
+			PublishedAt: timestamppb.Now(),
+			CreatedAt:   timestamppb.Now(),
+			Reacts:      &pb.Reacts{LikeCount: 103},
+		},
+	}
+
+	ustore := store.NewUserStore(store.SqlStore)
+	pstore := store.NewPostStore(store.SqlStore)
+
+	if err := ustore.NewUser(owner).Save(); err != nil {
+		t.Error(err)
+	}
+
+	defer ustore.NewUser(owner).Delete()
+
+	if err := pstore.NewPost(owner, post).Save(); err != nil {
+		t.Error(err)
+	}
+
+	res := S.Exec(context.TODO(), q, "UserOpsForDeletePost", map[string]any{
+		"postUuid": post.Uuid,
+	})
+
+	if len(res.Errors) > 0 {
+		t.Error(res.Errors)
+	}
+
+	body := make(map[string]any)
+
+	if err := json.Unmarshal(res.Data, &body); err != nil {
+		t.Fatal(err)
+	}
+
+	if P, err := pstore.GetByUuid(post.Uuid); err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		t.Error(err)
+	} else if P != nil {
+		t.Error("expected to delete the post.")
+	}
 }
 
 func TestUserOpsCreateComment(t *testing.T) {
