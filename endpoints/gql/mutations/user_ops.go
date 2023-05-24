@@ -1,6 +1,7 @@
 package mutations
 
 type UserOpsPostMutationsParameter struct {
+	Uuid                               string
 	HeadlineText, SummaryText, Content *string
 	Tags, Attachments, Refs            *[]string
 	Stage                              *int32
@@ -8,6 +9,8 @@ type UserOpsPostMutationsParameter struct {
 }
 
 type UserOpsCommentMutationsParameter struct {
+	Id                      float64
+	Uuid                    *string
 	CommentText, TargetUuid string
 	TargetType              string
 }

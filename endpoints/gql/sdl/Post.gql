@@ -55,6 +55,7 @@ type Post {
 }
 
 input UserOpsPostMutationsParameter {
+  uuid: String!
   headlineText: String
   summaryText: String
   content: String

@@ -32,6 +32,10 @@ type Comment {
 }
 
 input UserOpsCommentMutationsParameter {
+  # Represents the id of the user who created the comment.
+  id: Float!
+  
+  uuid: String
   commentText: String!
   targetUuid: String!
   targetType: CommentTargetType!

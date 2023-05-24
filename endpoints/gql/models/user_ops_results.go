@@ -1,11 +1,13 @@
 package models
 
-import "time"
+import (
+	"time"
+)
 
 type UserOpsType uint
 
 const (
-	UserOpsType_UO_CREATE_POST = iota
+	UserOpsType_UO_CREATE_POST UserOpsType = iota
 	UserOpsType_UO_UPDATE_POST
 	UserOpsType_UO_DELETE_POST
 	UserOpsType_UO_CREATE_COMMENT
@@ -23,10 +25,10 @@ func (so UserOpsType) String() string {
 }
 
 type UserOpsResults struct {
-	Op        SuperOpsType `json:"op"`
-	Message   *string      `json:"message"`
-	Code      int32        `json:"code"`
-	StartTime time.Time    `json:"startTime"`
-	EndTime   time.Time    `json:"endTime"`
-	Uuid      string       `json:"uuid"`
+	Op        UserOpsType `json:"op"`
+	Message   *string     `json:"message"`
+	Code      int32       `json:"code"`
+	StartTime time.Time   `json:"startTime"`
+	EndTime   time.Time   `json:"endTime"`
+	Uuid      string      `json:"uuid"`
 }
