@@ -76,7 +76,7 @@ func TestUserOpsDeletePost(t *testing.T) {
 	post := &pb.Post{
 		Id:           utils.RandomUniqueId(),
 		Uuid:         uuid.NewString(),
-		HeadlineText: "Example blog post",
+		HeadlineText: "Example Blog Post",
 		SummaryText:  "Just another example blog post for a unit test.",
 		User:         owner,
 		Tags:         &pb.Tags{Data: []string{"example", "test"}},
@@ -87,7 +87,7 @@ func TestUserOpsDeletePost(t *testing.T) {
 			ArchivedAt:  nil,
 			PublishedAt: timestamppb.Now(),
 			CreatedAt:   timestamppb.Now(),
-			Reacts:      &pb.Reacts{LikeCount: 103},
+			Reacts:      &pb.Reacts{LikeCount: 13},
 		},
 	}
 

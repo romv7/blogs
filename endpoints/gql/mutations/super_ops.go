@@ -21,3 +21,5 @@ type ArgsUpdateUser struct {
 type ArgsDeleteUser struct {
 	Uuid string
 }
+
+// TODO: Make a more meaningful message response. SuperOps

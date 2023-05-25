@@ -1,7 +1,8 @@
 package mutations
 
 type UserOpsPostMutationsParameter struct {
-	Uuid                               string
+	Id                                 float64
+	Uuid                               *string
 	HeadlineText, SummaryText, Content *string
 	Tags, Attachments, Refs            *[]string
 	Stage                              *int32
@@ -37,3 +38,5 @@ type ArgsUpdateComment struct {
 type ArgsDeleteComment struct {
 	Uuid string
 }
+
+// TODO: Make a more meaningful message response. UserOps

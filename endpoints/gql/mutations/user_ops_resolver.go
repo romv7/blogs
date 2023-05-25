@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"time"
 
+	_errors "errors"
+
 	"github.com/google/uuid"
 	"github.com/romv7/blogs/endpoints/gql/models"
 	"github.com/romv7/blogs/errors"
@@ -13,6 +15,7 @@ import (
 	"github.com/romv7/blogs/internal/store"
 	"github.com/romv7/blogs/internal/utils"
 	"google.golang.org/protobuf/types/known/timestamppb"
+	"gorm.io/gorm"
 )
 
 type UserMutations_Resolver struct{}
@@ -40,6 +43,144 @@ func (r *UserMutations_Resolver) UpdatePost(ctx context.Context, args *ArgsUpdat
 	defer func() {
 		res.EndTime = time.Now()
 	}()
+
+	ustore := store.NewUserStore(store.SqlStore)
+	pstore := store.NewPostStore(store.SqlStore)
+
+	var err error
+	var post *store.Post
+	var isNewPost bool
+
+	// Query the database for any existing post related to the uuid.
+	if args.Input.Uuid != nil {
+		post, err = pstore.GetByUuid(*args.Input.Uuid)
+	}
+
+	if err != nil && !_errors.Is(err, gorm.ErrRecordNotFound) {
+		message := err.Error()
+		res.Message = &message
+		res.Code = http.StatusBadRequest
+
+		return models.NewGQLModel_UserOpsResultsResolver(res), err
+	}
+
+	owner, err := ustore.GetById(uint64(args.Input.Id))
+	if err != nil {
+		message := err.Error()
+		res.Message = &message
+		res.Code = http.StatusBadRequest
+
+		return models.NewGQLModel_UserOpsResultsResolver(res), nil
+	}
+
+	// Only executed when the post is nil (indicating that this post is new)
+	if post == nil {
+		isNewPost = true
+		res.Op = models.UserOpsType_UO_CREATE_POST
+		post = pstore.NewPost(owner.Proto(), &pb.Post{
+			Id:           utils.RandomUniqueId(),
+			Uuid:         uuid.NewString(),
+			HeadlineText: "",
+			SummaryText:  "",
+			User:         owner.Proto(),
+			Comments:     make([]*pb.Comment, 0),
+			Tags:         &pb.Tags{},
+			Attachments:  make([]string, 0),
+			Refs:         make([]string, 0),
+			Content:      "",
+			State: &pb.PostState{
+				Reacts:      &pb.Reacts{},
+				CreatedAt:   timestamppb.Now(),
+				RevisedAt:   nil,
+				ArchivedAt:  nil,
+				PublishedAt: nil,
+				Stage:       pb.PostState_S_WIP,
+				Status:      pb.PostState_S_DRAFT,
+			},
+		})
+	}
+
+	// Check if the matching post is owned by the current user request.
+	if !isNewPost && owner.Proto().Id != post.Proto().Id {
+		err := fmt.Errorf("user (%d) is not allowed to update this post", owner.Proto().Id)
+		// TODO: If someone is attempting to update a post by someone.
+		//       do something to stop this guy.
+		message := err.Error()
+		res.Message = &message
+		res.Code = http.StatusForbidden
+
+		return models.NewGQLModel_UserOpsResultsResolver(res), err
+	}
+
+	pbpost := post.Proto()
+
+	if !isNewPost {
+		pbpost.State.Stage = pb.PostState_S_REV
+		pbpost.State.RevisedAt = timestamppb.Now()
+	}
+
+	if args.Input.HeadlineText != nil {
+		pbpost.HeadlineText = *args.Input.HeadlineText
+	}
+
+	if args.Input.SummaryText != nil {
+		pbpost.SummaryText = *args.Input.SummaryText
+	}
+
+	if args.Input.Tags != nil {
+		pbpost.Tags = &pb.Tags{Data: *args.Input.Tags}
+	}
+
+	if args.Input.Stage != nil {
+		pbpost.State.Stage = pb.PostState_Stage(*args.Input.Stage)
+
+		switch pbpost.State.Stage {
+		case pb.PostState_S_PUB:
+			pbpost.State.PublishedAt = timestamppb.Now()
+		}
+	}
+
+	if args.Input.Status != nil {
+		pbpost.State.Status = pb.PostState_Status(*args.Input.Status)
+
+		switch pbpost.State.Status {
+		case pb.PostState_S_ARCHIVED:
+			pbpost.State.ArchivedAt = timestamppb.Now()
+		}
+	}
+
+	if args.Input.Content != nil {
+		pbpost.Content = *args.Input.Content
+	}
+
+	if args.Input.Refs != nil {
+		pbpost.Refs = *args.Input.Refs
+	}
+
+	if args.Input.Attachments != nil {
+		pbpost.Attachments = *args.Input.Attachments
+	}
+
+	// Propagate the upate in the database.
+	if err = pstore.NewPost(owner.Proto(), pbpost).Save(); err != nil {
+		message := err.Error()
+		res.Message = &message
+		res.Code = http.StatusBadRequest
+
+		return models.NewGQLModel_UserOpsResultsResolver(res), nil
+	}
+
+	var message string
+
+	if isNewPost {
+		message = fmt.Sprintf("post created (%s)", pbpost.Uuid)
+		res.Code = http.StatusAccepted
+	} else {
+		message = fmt.Sprintf("post was updated (%s)", pbpost.Uuid)
+		res.Code = http.StatusOK
+	}
+
+	res.Message = &message
 
 	return models.NewGQLModel_UserOpsResultsResolver(res), nil
 }
