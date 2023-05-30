@@ -40,6 +40,11 @@ type BlogServiceClient interface {
 	SaveComment(ctx context.Context, in *BlogService_SaveComment_Params, opts ...grpc.CallOption) (*BlogService_SaveComment_Response, error)
 	// Destructive! Removes the comment from any persistence storage in thte internal service. (Sounds similar to the DeleteBlogPost!)
 	DeleteComment(ctx context.Context, in *BlogService_DeleteComment_Params, opts ...grpc.CallOption) (*BlogService_DeleteComment_Response, error)
+	GlobalSearch(ctx context.Context, in *BlogService_GlobalSearch_Params, opts ...grpc.CallOption) (*SearchResults, error)
+	GlobalLatestBlogPosts(ctx context.Context, in *BlogService_GlobalLatestBlogPosts_Params, opts ...grpc.CallOption) (*BlogService_GlobalLatestBlogPosts_Response, error)
+	Author_GetAuthorInfo(ctx context.Context, in *BlogService_AuthorGetInfo_Params, opts ...grpc.CallOption) (*User, error)
+	Author_LatestBlogPosts(ctx context.Context, in *BlogService_AuthorLatestBlogPosts_Params, opts ...grpc.CallOption) (*BlogService_AuthorLatestBlogPosts_Response, error)
+	Author_GetBlogPosts(ctx context.Context, in *BlogService_AuthorGetBlogPosts_Params, opts ...grpc.CallOption) (*BlogService_AuthorGetBlogPosts_Response, error)
 }
 
 type blogServiceClient struct {
@@ -113,6 +118,51 @@ func (c *blogServiceClient) DeleteComment(ctx context.Context, in *BlogService_D
 	return out, nil
 }
 
+func (c *blogServiceClient) GlobalSearch(ctx context.Context, in *BlogService_GlobalSearch_Params, opts ...grpc.CallOption) (*SearchResults, error) {
+	out := new(SearchResults)
+	err := c.cc.Invoke(ctx, "/blogs.BlogService/GlobalSearch", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *blogServiceClient) GlobalLatestBlogPosts(ctx context.Context, in *BlogService_GlobalLatestBlogPosts_Params, opts ...grpc.CallOption) (*BlogService_GlobalLatestBlogPosts_Response, error) {
+	out := new(BlogService_GlobalLatestBlogPosts_Response)
+	err := c.cc.Invoke(ctx, "/blogs.BlogService/GlobalLatestBlogPosts", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *blogServiceClient) Author_GetAuthorInfo(ctx context.Context, in *BlogService_AuthorGetInfo_Params, opts ...grpc.CallOption) (*User, error) {
+	out := new(User)
+	err := c.cc.Invoke(ctx, "/blogs.BlogService/Author_GetAuthorInfo", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *blogServiceClient) Author_LatestBlogPosts(ctx context.Context, in *BlogService_AuthorLatestBlogPosts_Params, opts ...grpc.CallOption) (*BlogService_AuthorLatestBlogPosts_Response, error) {
+	out := new(BlogService_AuthorLatestBlogPosts_Response)
+	err := c.cc.Invoke(ctx, "/blogs.BlogService/Author_LatestBlogPosts", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *blogServiceClient) Author_GetBlogPosts(ctx context.Context, in *BlogService_AuthorGetBlogPosts_Params, opts ...grpc.CallOption) (*BlogService_AuthorGetBlogPosts_Response, error) {
+	out := new(BlogService_AuthorGetBlogPosts_Response)
+	err := c.cc.Invoke(ctx, "/blogs.BlogService/Author_GetBlogPosts", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // BlogServiceServer is the server API for BlogService service.
 // All implementations must embed UnimplementedBlogServiceServer
 // for forward compatibility
@@ -135,6 +185,11 @@ type BlogServiceServer interface {
 	SaveComment(context.Context, *BlogService_SaveComment_Params) (*BlogService_SaveComment_Response, error)
 	// Destructive! Removes the comment from any persistence storage in thte internal service. (Sounds similar to the DeleteBlogPost!)
 	DeleteComment(context.Context, *BlogService_DeleteComment_Params) (*BlogService_DeleteComment_Response, error)
+	GlobalSearch(context.Context, *BlogService_GlobalSearch_Params) (*SearchResults, error)
+	GlobalLatestBlogPosts(context.Context, *BlogService_GlobalLatestBlogPosts_Params) (*BlogService_GlobalLatestBlogPosts_Response, error)
+	Author_GetAuthorInfo(context.Context, *BlogService_AuthorGetInfo_Params) (*User, error)
+	Author_LatestBlogPosts(context.Context, *BlogService_AuthorLatestBlogPosts_Params) (*BlogService_AuthorLatestBlogPosts_Response, error)
+	Author_GetBlogPosts(context.Context, *BlogService_AuthorGetBlogPosts_Params) (*BlogService_AuthorGetBlogPosts_Response, error)
 	mustEmbedUnimplementedBlogServiceServer()
 }
 
@@ -162,6 +217,21 @@ func (UnimplementedBlogServiceServer) SaveComment(context.Context, *BlogService_
 }
 func (UnimplementedBlogServiceServer) DeleteComment(context.Context, *BlogService_DeleteComment_Params) (*BlogService_DeleteComment_Response, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteComment not implemented")
+}
+func (UnimplementedBlogServiceServer) GlobalSearch(context.Context, *BlogService_GlobalSearch_Params) (*SearchResults, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GlobalSearch not implemented")
+}
+func (UnimplementedBlogServiceServer) GlobalLatestBlogPosts(context.Context, *BlogService_GlobalLatestBlogPosts_Params) (*BlogService_GlobalLatestBlogPosts_Response, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GlobalLatestBlogPosts not implemented")
+}
+func (UnimplementedBlogServiceServer) Author_GetAuthorInfo(context.Context, *BlogService_AuthorGetInfo_Params) (*User, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Author_GetAuthorInfo not implemented")
+}
+func (UnimplementedBlogServiceServer) Author_LatestBlogPosts(context.Context, *BlogService_AuthorLatestBlogPosts_Params) (*BlogService_AuthorLatestBlogPosts_Response, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Author_LatestBlogPosts not implemented")
+}
+func (UnimplementedBlogServiceServer) Author_GetBlogPosts(context.Context, *BlogService_AuthorGetBlogPosts_Params) (*BlogService_AuthorGetBlogPosts_Response, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Author_GetBlogPosts not implemented")
 }
 func (UnimplementedBlogServiceServer) mustEmbedUnimplementedBlogServiceServer() {}
 
@@ -302,6 +372,96 @@ func _BlogService_DeleteComment_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
+func _BlogService_GlobalSearch_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(BlogService_GlobalSearch_Params)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BlogServiceServer).GlobalSearch(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/blogs.BlogService/GlobalSearch",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BlogServiceServer).GlobalSearch(ctx, req.(*BlogService_GlobalSearch_Params))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _BlogService_GlobalLatestBlogPosts_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(BlogService_GlobalLatestBlogPosts_Params)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BlogServiceServer).GlobalLatestBlogPosts(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/blogs.BlogService/GlobalLatestBlogPosts",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BlogServiceServer).GlobalLatestBlogPosts(ctx, req.(*BlogService_GlobalLatestBlogPosts_Params))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _BlogService_Author_GetAuthorInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(BlogService_AuthorGetInfo_Params)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BlogServiceServer).Author_GetAuthorInfo(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/blogs.BlogService/Author_GetAuthorInfo",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BlogServiceServer).Author_GetAuthorInfo(ctx, req.(*BlogService_AuthorGetInfo_Params))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _BlogService_Author_LatestBlogPosts_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(BlogService_AuthorLatestBlogPosts_Params)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BlogServiceServer).Author_LatestBlogPosts(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/blogs.BlogService/Author_LatestBlogPosts",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BlogServiceServer).Author_LatestBlogPosts(ctx, req.(*BlogService_AuthorLatestBlogPosts_Params))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _BlogService_Author_GetBlogPosts_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(BlogService_AuthorGetBlogPosts_Params)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BlogServiceServer).Author_GetBlogPosts(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/blogs.BlogService/Author_GetBlogPosts",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BlogServiceServer).Author_GetBlogPosts(ctx, req.(*BlogService_AuthorGetBlogPosts_Params))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // BlogService_ServiceDesc is the grpc.ServiceDesc for BlogService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -336,6 +496,26 @@ var BlogService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteComment",
 			Handler:    _BlogService_DeleteComment_Handler,
+		},
+		{
+			MethodName: "GlobalSearch",
+			Handler:    _BlogService_GlobalSearch_Handler,
+		},
+		{
+			MethodName: "GlobalLatestBlogPosts",
+			Handler:    _BlogService_GlobalLatestBlogPosts_Handler,
+		},
+		{
+			MethodName: "Author_GetAuthorInfo",
+			Handler:    _BlogService_Author_GetAuthorInfo_Handler,
+		},
+		{
+			MethodName: "Author_LatestBlogPosts",
+			Handler:    _BlogService_Author_LatestBlogPosts_Handler,
+		},
+		{
+			MethodName: "Author_GetBlogPosts",
+			Handler:    _BlogService_Author_GetBlogPosts_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

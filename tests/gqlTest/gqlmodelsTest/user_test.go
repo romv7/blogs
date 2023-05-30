@@ -6,15 +6,12 @@ import (
 	"github.com/google/uuid"
 	"github.com/romv7/blogs/endpoints/gql/models"
 	"github.com/romv7/blogs/internal/pb"
-	"github.com/romv7/blogs/internal/store"
 	"github.com/romv7/blogs/internal/utils"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func TestUserProtoFunc(t *testing.T) {
-	ustore := store.NewUserStore(store.SqlStore)
-
-	upb := ustore.NewUser(&pb.User{
+	upb := &pb.User{
 		Id:       utils.RandomUniqueId(),
 		Uuid:     uuid.NewString(),
 		FullName: "Rom Vales Villanueva",
@@ -27,11 +24,11 @@ func TestUserProtoFunc(t *testing.T) {
 			Disabled:  false,
 			UVerified: true,
 		},
-	})
+	}
 
-	u := models.Proto_GQLModelUser(upb.Proto())
+	u := models.Proto_GQLModelUser(upb)
 
-	if uint64(u.Id) != upb.Proto().Id {
+	if uint64(u.Id) != upb.Id {
 		t.Error("Something is definitely wrong with floats.")
 	}
 }

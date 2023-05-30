@@ -7,10 +7,22 @@ type SearchResultsStats {
 
 type SearchResults {
   keyword: String!
-  people: [User!]!
-  posts: [Post!]!
-  comments: [Comment!]!
+  people(input: SearchResultPeopleFilter): UserConnection!
+  posts(input: SearchResultPostFilter): PostConnection!
+  comments(input: SearchResultCommentFilter): CommentConnection!
   stats: SearchResultsStats!
   startTime: Time!
   endTime: Time!
+}
+
+input SearchResultPeopleFilter {
+
+}
+
+input SearchResultPostFilter {
+
+}
+
+input SearchResultCommentFilter {
+
 }

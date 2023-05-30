@@ -1,6 +1,7 @@
 package sql
 
 import (
+	"fmt"
 	"os"
 	"time"
 
@@ -8,7 +9,21 @@ import (
 
 	gorm_mysql "gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
+
+type StderrLogger struct {
+	f *os.File
+}
+
+func NewStderrLogger(f *os.File) *StderrLogger {
+	return &StderrLogger{f}
+}
+
+func (l *StderrLogger) Printf(fmtstr string, args ...any) {
+	fmt.Printf(fmtstr, args...)
+	l.f.Write([]byte(fmt.Sprintf(fmtstr, args...)))
+}
 
 var (
 	sqlConfig = &mysql.Config{
@@ -25,6 +40,7 @@ var (
 
 	gormConfig = &gorm.Config{
 		PrepareStmt: true,
+		Logger:      logger.New(NewStderrLogger(os.Stdout), logger.Config{}),
 	}
 
 	sqlDialectorConfig = gorm_mysql.Config{

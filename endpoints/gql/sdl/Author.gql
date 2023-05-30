@@ -1,0 +1,14 @@
+
+
+type Author {
+  authorInfo: User!
+
+  latestPosts(filter: PostConnectionFilter): PostConnection!
+
+  posts(
+    first: Int, 
+    after: PostForwardCursor, 
+    last: Int, 
+    before: PostBackwardCursor, 
+    filter: PostConnectionFilter): PostConnection!
+}

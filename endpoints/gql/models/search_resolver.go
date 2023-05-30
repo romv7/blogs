@@ -11,14 +11,14 @@ type GQLModel_GlobalSearchResultsResolver struct {
 	res *GlobalSearchResults
 }
 
-func NewGlobalSearch(ctx context.Context, keyword string) *GQLModel_GlobalSearchResultsResolver {
+func NewGQLModel_GlobalSearchResultsResolver(ctx context.Context, keyword string) *GQLModel_GlobalSearchResultsResolver {
 
 	return &GQLModel_GlobalSearchResultsResolver{
 		res: &GlobalSearchResults{
 			Keyword:  keyword,
-			People:   &[]*GQLModel_UserResolver{},
-			Comments: &[]*GQLModel_CommentResolver{},
-			Posts:    &[]*GQLModel_PostResolver{},
+			People:   &GQLModel_UserConnectionResolver{},
+			Comments: &GQLModel_CommentConnectionResolver{},
+			Posts:    &GQLModel_PostConnectionResolver{},
 			Stats: &GQLModel_SearchResultsStatsResolver{
 				res: &GlobalSearchResultsStats{},
 			},
@@ -28,20 +28,26 @@ func NewGlobalSearch(ctx context.Context, keyword string) *GQLModel_GlobalSearch
 	}
 }
 
+// Type aliases for conviniently accessing some structs.
+type ctxt = context.Context
+type userFilter = *ArgsSearchResultUserFilter
+type postFilter = *ArgsSearchResultPostFilter
+type commentFilter = *ArgsSearchResultCommentFilter
+
 func (s *GQLModel_GlobalSearchResultsResolver) Keyword() string {
 	return s.res.Keyword
 }
 
-func (s *GQLModel_GlobalSearchResultsResolver) People() []*GQLModel_UserResolver {
-	return *s.res.People
+func (s *GQLModel_GlobalSearchResultsResolver) People(ctx ctxt, args userFilter) *GQLModel_UserConnectionResolver {
+	return s.res.People
 }
 
-func (s *GQLModel_GlobalSearchResultsResolver) Posts() []*GQLModel_PostResolver {
-	return *s.res.Posts
+func (s *GQLModel_GlobalSearchResultsResolver) Posts(ctx ctxt, args postFilter) *GQLModel_PostConnectionResolver {
+	return s.res.Posts
 }
 
-func (s *GQLModel_GlobalSearchResultsResolver) Comments() []*GQLModel_CommentResolver {
-	return *s.res.Comments
+func (s *GQLModel_GlobalSearchResultsResolver) Comments(ctx ctxt, args commentFilter) *GQLModel_CommentConnectionResolver {
+	return s.res.Comments
 }
 
 func (s *GQLModel_GlobalSearchResultsResolver) Stats() *GQLModel_SearchResultsStatsResolver {

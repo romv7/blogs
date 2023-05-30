@@ -27,14 +27,7 @@ func NewUserMutations_Resolver() *UserMutations_Resolver {
 type userOpsResolver = *models.GQLModel_UserOpsResultsResolver
 
 func (r *UserMutations_Resolver) CreatePost(ctx context.Context, args *ArgsCreatePost) (userOpsResolver, error) {
-	res := &models.UserOpsResults{Op: models.UserOpsType_UO_CREATE_POST, StartTime: time.Now()}
-	defer func() {
-		res.EndTime = time.Now()
-	}()
-
-	r.UpdatePost(ctx, &ArgsUpdatePost{Input: args.Input})
-
-	return models.NewGQLModel_UserOpsResultsResolver(res), nil
+	return r.UpdatePost(ctx, &ArgsUpdatePost{Input: args.Input})
 }
 
 func (r *UserMutations_Resolver) UpdatePost(ctx context.Context, args *ArgsUpdatePost) (userOpsResolver, error) {
@@ -73,23 +66,25 @@ func (r *UserMutations_Resolver) UpdatePost(ctx context.Context, args *ArgsUpdat
 		return models.NewGQLModel_UserOpsResultsResolver(res), nil
 	}
 
+	user := owner.Proto()
+
 	// Only executed when the post is nil (indicating that this post is new)
 	if post == nil {
 		isNewPost = true
 		res.Op = models.UserOpsType_UO_CREATE_POST
-		post = pstore.NewPost(owner.Proto(), &pb.Post{
+		post = pstore.NewPost(user, &pb.Post{
 			Id:           utils.RandomUniqueId(),
 			Uuid:         uuid.NewString(),
 			HeadlineText: "",
 			SummaryText:  "",
-			User:         owner.Proto(),
+			Content:      "",
+			User:         user,
 			Comments:     make([]*pb.Comment, 0),
 			Tags:         &pb.Tags{},
 			Attachments:  make([]string, 0),
 			Refs:         make([]string, 0),
-			Content:      "",
 			State: &pb.PostState{
-				Reacts:      &pb.Reacts{},
+				Reacts:      &pb.Reacts{LoveCount: 154},
 				CreatedAt:   timestamppb.Now(),
 				RevisedAt:   nil,
 				ArchivedAt:  nil,
@@ -100,9 +95,11 @@ func (r *UserMutations_Resolver) UpdatePost(ctx context.Context, args *ArgsUpdat
 		})
 	}
 
+	pbpost := post.Proto()
+
 	// Check if the matching post is owned by the current user request.
-	if !isNewPost && owner.Proto().Id != post.Proto().Id {
-		err := fmt.Errorf("user (%d) is not allowed to update this post", owner.Proto().Id)
+	if !isNewPost && user.Id != pbpost.User.Id {
+		err := fmt.Errorf("user (%d) is not allowed to update this post", user.Id)
 		// TODO: If someone is attempting to update a post by someone.
 		//       do something to stop this guy.
 		message := err.Error()
@@ -111,8 +108,6 @@ func (r *UserMutations_Resolver) UpdatePost(ctx context.Context, args *ArgsUpdat
 
 		return models.NewGQLModel_UserOpsResultsResolver(res), err
 	}
-
-	pbpost := post.Proto()
 
 	if !isNewPost {
 		pbpost.State.Stage = pb.PostState_S_REV
@@ -161,13 +156,19 @@ func (r *UserMutations_Resolver) UpdatePost(ctx context.Context, args *ArgsUpdat
 		pbpost.Attachments = *args.Input.Attachments
 	}
 
-	// Propagate the upate in the database.
-	if err = pstore.NewPost(owner.Proto(), pbpost).Save(); err != nil {
+	P := pstore.NewPost(user, pbpost)
+
+	if !isNewPost {
+		P.ToggleUpdateMode()
+	}
+
+	// Propagate the upate to the database.
+	if err = P.Save(); err != nil {
 		message := err.Error()
 		res.Message = &message
 		res.Code = http.StatusBadRequest
 
-		return models.NewGQLModel_UserOpsResultsResolver(res), nil
+		return models.NewGQLModel_UserOpsResultsResolver(res), err
 	}
 
 	var message string
@@ -181,6 +182,7 @@ func (r *UserMutations_Resolver) UpdatePost(ctx context.Context, args *ArgsUpdat
 	}
 
 	res.Message = &message
+	res.Uuid = pbpost.Uuid
 
 	return models.NewGQLModel_UserOpsResultsResolver(res), nil
 }

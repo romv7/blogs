@@ -217,7 +217,7 @@ func (SuperMutations_Resolver) DeleteUser(ctx context.Context, args *ArgsDeleteU
 	res.Message = &message
 
 	res.Code = http.StatusNoContent
-	res.Uuid = user.Proto().Uuid
+	res.Uuid = args.Uuid
 
 	return models.NewGQLModel_SuperOpsResultsResolver(res), nil
 }

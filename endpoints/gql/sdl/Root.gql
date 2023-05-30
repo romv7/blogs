@@ -1,11 +1,18 @@
 # This is the entrypoint/root for all of our defined schemas on the separate schemas folder.
 
 type Query {
-  
   # Used to search for a specific entity on the entire data source. If no results were found by
   # the query.
-  globalSearch(keyword: String): SearchResults!
-
+  globalSearch(keyword: String, category: [String!]): SearchResults!
+  
+  # List the most recently published posts by anyone in the blog API.
+  globalLatestPosts(
+    first: Int
+    after: PostForwardCursor
+    last: Int
+    before: PostBackwardCursor): PostConnection!
+  
+  author(id: Float, uuid: String): Author!
 }
 
 type Mutation {
@@ -17,4 +24,5 @@ type Mutation {
   # Mutations related to users are defined in this type. We shuold consider adding a rate limiting
   # features to this as it can be abused by anyone.
   userOps: UserMutations!
+  
 }

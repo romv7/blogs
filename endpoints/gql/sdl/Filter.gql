@@ -1,0 +1,13 @@
+
+input PostConnectionFilter {
+
+}
+
+input UserConnectionFilter {
+
+}
+
+input CommentConnectionFilter {
+  
+}
+

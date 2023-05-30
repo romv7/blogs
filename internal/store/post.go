@@ -28,21 +28,20 @@ func (p *Post) Proto() *pb.Post {
 
 			if pout.User.Type == pb.User_T_AUTHOR {
 				ah := author.NewAuthorHelper(pout.User, p.s)
-
 				// TODO: Get post metadata from the p.s storage.
 				switch p.s {
 				case storage.Plain:
 					m, content, err := ah.GetAuthorPostMetadata(pout)
-
 					var Err error
 
-					// The post still isn't save in the storage.
-					if err == nil {
+					// The post still isn't save in the storage we save it,
+					// if other errors occured panic.
+					if m != nil && !p.isUpdated {
 						pout.HeadlineText = m.HeadlineText
 						pout.SummaryText = m.SummaryText
 						pout.Refs = m.References
 						pout.Content = content
-					} else if os.IsNotExist(err) {
+					} else if os.IsNotExist(err) || p.isUpdated {
 						Err = ah.SaveAuthorPost(pout)
 					} else {
 						Err = err
@@ -76,10 +75,12 @@ func (p *Post) Save() (err error) {
 		return
 	}
 
-	if p.Proto().User != nil && p.Proto().User.Type == pb.User_T_AUTHOR {
-		ah := author.NewAuthorHelper(p.Proto().User, storage.Plain)
+	post := p.Proto()
 
-		if err = ah.SaveAuthorPost(p.Proto()); err != nil {
+	if post.User != nil && post.User.Type == pb.User_T_AUTHOR {
+		ah := author.NewAuthorHelper(post.User, storage.Plain)
+
+		if err = ah.SaveAuthorPost(post); err != nil {
 			return author.ErrNormalUserHasNoResourceId
 		}
 	}
@@ -92,16 +93,16 @@ func (p *Post) Save() (err error) {
 func (p *Post) Delete() (err error) {
 	pstore := NewPostStore(p.t)
 
-	if p.Proto().User != nil && p.Proto().User.Type == pb.User_T_AUTHOR {
-		ah := author.NewAuthorHelper(p.Proto().User, storage.Plain)
-		if err = ah.DeletePostMetadata(p.Proto()); err != nil {
+	post := p.Proto()
+
+	if post.User != nil && post.User.Type == pb.User_T_AUTHOR {
+		ah := author.NewAuthorHelper(post.User, storage.Plain)
+		if err = ah.DeletePostMetadata(post); err != nil {
 			return
 		}
 	}
 
-	err = pstore.Delete(p)
-
-	return
+	return pstore.Delete(p)
 }
 
 // Careful with this method, because it can change who will be the owner of the post.
@@ -112,4 +113,8 @@ func (p *Post) SetOwner(u *User) {
 	default:
 		log.Panic(ErrInvalidStore)
 	}
+}
+
+func (p *Post) ToggleUpdateMode() {
+	p.isUpdated = !p.isUpdated
 }

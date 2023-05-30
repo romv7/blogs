@@ -137,3 +137,28 @@ func (svc *BlogService) DeleteComment(ctx context.Context, params *pb.BlogServic
 
 	return &pb.BlogService_DeleteComment_Response{}, nil
 }
+
+func (svc *BlogService) GlobalSearch(ctx context.Context, params *pb.BlogService_GlobalSearch_Params) (*pb.SearchResults, error) {
+
+	return nil, nil
+}
+
+func (svc *BlogService) GlobalLatestBlogPosts(ctx context.Context, params *pb.BlogService_GlobalLatestBlogPosts_Params) (*pb.BlogService_GlobalLatestBlogPosts_Response, error) {
+
+	return nil, nil
+}
+
+func (svc *BlogService) Author_GetAuthorInfo(ctx context.Context, params *pb.BlogService_AuthorGetInfo_Params) (*pb.User, error) {
+
+	return nil, nil
+}
+
+func (svc *BlogService) Author_LatestBlogPosts(ctx context.Context, params *pb.BlogService_AuthorLatestBlogPosts_Params) (*pb.BlogService_AuthorLatestBlogPosts_Response, error) {
+
+	return nil, nil
+}
+
+func (svc *BlogService) Author_GetBlogPosts(ctx context.Context, params *pb.BlogService_AuthorGetBlogPosts_Params) (*pb.BlogService_AuthorGetBlogPosts_Response, error) {
+
+	return nil, nil
+}

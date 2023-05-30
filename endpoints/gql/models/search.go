@@ -4,9 +4,9 @@ import "time"
 
 type GlobalSearchResults struct {
 	Keyword   string                               `json:"keyword"`
-	People    *[]*GQLModel_UserResolver            `json:"people"`
-	Posts     *[]*GQLModel_PostResolver            `json:"posts"`
-	Comments  *[]*GQLModel_CommentResolver         `json:"comments"`
+	People    *GQLModel_UserConnectionResolver     `json:"people"`
+	Posts     *GQLModel_PostConnectionResolver     `json:"posts"`
+	Comments  *GQLModel_CommentConnectionResolver  `json:"comments"`
 	Stats     *GQLModel_SearchResultsStatsResolver `json:"stats"`
 	StartTime time.Time                            `json:"startTime"`
 	EndTime   time.Time                            `json:"endTime"`
@@ -18,6 +18,35 @@ type GlobalSearchResultsStats struct {
 	CommentsCount uint64 `json:"commentsCount"`
 }
 
+// SearchResultFilter
+type SearchResultFilter struct {
+}
+
+type UserFilter struct {
+	SearchResultFilter
+}
+
+type PostFilter struct {
+	SearchResultFilter
+}
+
+type CommentFilter struct {
+	SearchResultFilter
+}
+
 type ArgsGlobalSearch struct {
-	Keyword *string
+	Keyword  *string
+	Category *[]string
+}
+
+type ArgsSearchResultUserFilter struct {
+	Input *UserFilter
+}
+
+type ArgsSearchResultPostFilter struct {
+	Input *PostFilter
+}
+
+type ArgsSearchResultCommentFilter struct {
+	Input *CommentFilter
 }

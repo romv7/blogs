@@ -8,7 +8,6 @@ require (
 	github.com/google/uuid v1.3.0
 	github.com/graph-gophers/dataloader v5.0.0+incompatible
 	github.com/graph-gophers/graphql-go v1.5.0
-	github.com/graphql-go/graphql v0.8.1
 	google.golang.org/grpc v1.55.0
 	google.golang.org/protobuf v1.30.0
 	gorm.io/driver/mysql v1.5.0

@@ -1,0 +1,61 @@
+
+type PostConnection {
+  edges: [PostEdge]
+  pageInfo: PageInfo!
+}
+
+type PostEdge {
+  cursor: String!
+  node: Post
+}
+
+type UserConnection {
+  edges: [UserEdge]
+  pageInfo: PageInfo!
+}
+
+type UserEdge {
+  cursor: String!
+  node: User
+}
+
+type CommentConnection {
+  edges: [CommentEdge]
+  pageInfo: PageInfo!
+}
+
+type CommentEdge {
+  cursor: String!
+  node: Comment
+}
+
+type PageInfo {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String
+  endCursor: String
+}
+
+input PostForwardCursor {
+
+}
+
+input PostBackwardCursor {
+
+}
+
+input UserForwardCursor {
+
+}
+
+input UserBackwardCursor {
+
+}
+
+input CommentForwardCursor {
+
+}
+
+input CommentBackwardCursor {
+
+}

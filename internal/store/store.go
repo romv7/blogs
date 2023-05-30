@@ -17,5 +17,6 @@ var (
 
 	// When an invoker tries to instantiate a Store type using an invalid store
 	// this error is returned.
-	ErrInvalidStore = errors.New("invalid store selected")
+	ErrInvalidStore             = errors.New("invalid store selected")
+	ErrUnauthorizedToCreatePost = errors.New("user unauthorized to create post")
 )

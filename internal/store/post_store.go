@@ -8,15 +8,15 @@ import (
 	"github.com/romv7/blogs/internal/storage"
 	sqlStore "github.com/romv7/blogs/internal/store/sql"
 	sqlModels "github.com/romv7/blogs/internal/store/sql/models"
-	"github.com/romv7/blogs/internal/utils/author"
 
 	"gorm.io/gorm"
 )
 
 type Post struct {
-	t        StoreType
-	s        storage.StorageDriverType
-	sqlModel *sqlModels.Post
+	t         StoreType
+	s         storage.StorageDriverType
+	isUpdated bool
+	sqlModel  *sqlModels.Post
 }
 
 type PostStore struct {
@@ -40,12 +40,11 @@ func (s *PostStore) GetMainStore() (S any) {
 }
 
 func (s *PostStore) NewPost(u *pb.User, p *pb.Post) (out *Post) {
-	if u.Type == pb.User_T_NORMAL {
-		log.Panic(author.ErrInvalidArgument)
-	}
-
 	out = &Post{}
-	p.User = u
+
+	if p.User == nil {
+		p.User = u
+	}
 
 	switch s.t {
 	case SqlStore:
@@ -62,6 +61,10 @@ func (s *PostStore) NewPost(u *pb.User, p *pb.Post) (out *Post) {
 }
 
 func (s *PostStore) Save(p *Post) (err error) {
+	if p.Proto().User.Type == pb.User_T_NORMAL {
+		return ErrUnauthorizedToCreatePost
+	}
+
 	switch s.t {
 	case SqlStore:
 		db := sqlStore.Store()

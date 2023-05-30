@@ -9,6 +9,7 @@ import (
 	"github.com/romv7/blogs/internal/utils/author"
 )
 
+// TODO: Has side effects,
 func (u *User) Proto() (out *pb.User) {
 
 	// This method will not rely on the u.IsAuthor method to determine whether the user is an author or not
@@ -67,15 +68,7 @@ func (u *User) Save() (err error) {
 
 func (u *User) Delete() (err error) {
 	ustore := NewUserStore(u.t)
-
-	if err = ustore.Delete(u); err != nil {
-		return
-	}
-
-	if u.Proto().Type == pb.User_T_AUTHOR {
-		ah := author.NewAuthorHelper(u.Proto(), storage.Plain)
-		err = ah.DeleteAuthorMetadata()
-	}
+	err = ustore.Delete(u)
 
 	return
 }

@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	rootGqlDir = os.Getenv("ROOTDIR") + "/endpoints/gql"
+	rootGqlDir = os.Getenv("ROOTDIR") + "/endpoints/gql/sdl"
 )
 
 func JoinAllSchemaFiles() (out string) {

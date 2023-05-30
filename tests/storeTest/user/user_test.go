@@ -55,7 +55,7 @@ func TestShouldUpdateUserType(t *testing.T) {
 
 func TestExpectToVerifyAnUnverifiedUser(t *testing.T) {
 	ustore.Save(mockUser)
-	defer ustore.Delete(mockUser)
+	defer mockUser.Delete()
 
 	if err := mockUser.Verify(); err != nil {
 		t.Error("failed to verify user: ")

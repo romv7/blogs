@@ -16,31 +16,179 @@ import (
 )
 
 func TestUserOpsCreatePost(t *testing.T) {
-	_ = `
+	S := gql.DefaultSchema()
+	q := `
 	mutation UserOpsForCreatePost($post: UserOpsPostMutationsParameter!) {
 		userOps {
 			createPost(input: $post) {
-				
+				op
+				code
+				message
+				uuid
 			}
 		}
 	}
 	`
 
-	t.Error("not implemented")
+	owner := &pb.User{
+		Id:       utils.RandomUniqueId(),
+		Uuid:     uuid.NewString(),
+		Name:     "quirky34bastard",
+		FullName: "Quirky 34 Bastard",
+		Email:    "quirk34@gmail.com",
+		Type:     pb.User_T_AUTHOR,
+		State: &pb.UserState{
+			CreatedAt: timestamppb.Now(),
+			UpdatedAt: timestamppb.Now(),
+			Disabled:  false,
+			UVerified: true,
+		},
+	}
+
+	ustore := store.NewUserStore(store.SqlStore)
+	pstore := store.NewPostStore(store.SqlStore)
+
+	if err := ustore.NewUser(owner).Save(); err != nil {
+		t.Error(err)
+	}
+
+	defer ustore.NewUser(owner).Delete()
+
+	empty := map[string]any{"id": float64(owner.Id)}
+
+	res := S.Exec(context.TODO(), q, "UserOpsForCreatePost", map[string]any{
+		"post": empty,
+	})
+
+	if len(res.Errors) > 0 {
+		t.Errorf("%+v", res.Errors)
+	}
+
+	body := map[string]any{}
+
+	if err := json.Unmarshal(res.Data, &body); err != nil {
+		t.Fatal(err)
+	}
+
+	postUuid := body["userOps"].(map[string]any)["createPost"].(map[string]any)["uuid"].(string)
+
+	var post *store.Post
+
+	if P, err := pstore.GetByUuid(postUuid); err != nil {
+		t.Error(err)
+	} else if P.Proto().HeadlineText != "" {
+		t.Error("did not match the expected headline text.")
+	} else {
+		post = P
+	}
+
+	if post.Proto().Uuid != postUuid {
+		t.Error("did not match the expected post uuid.")
+	}
+
+	if err := post.Delete(); err != nil {
+		t.Error(err)
+	}
 }
 
 func TestUserOpsUpdatePost(t *testing.T) {
-	_ = `
+	S := gql.DefaultSchema()
+	q := `
 	mutation UserOpsForUpdatePost($post: UserOpsPostMutationsParameter!) {
 		userOps {
 			updatePost(input: $post) {
-				
+				op
+				code
+				message
+				uuid
 			}
 		}
 	}
 	`
 
-	t.Error("not implemented")
+	owner := &pb.User{
+		Id:       utils.RandomUniqueId(),
+		Uuid:     uuid.NewString(),
+		Name:     "quirky36bastard",
+		FullName: "Quirky 36 Bastard",
+		Email:    "quirk34@gmail.com",
+		Type:     pb.User_T_AUTHOR,
+		State: &pb.UserState{
+			CreatedAt: timestamppb.Now(),
+			UpdatedAt: timestamppb.Now(),
+			Disabled:  false,
+			UVerified: true,
+		},
+	}
+
+	post := &pb.Post{
+		Id:           utils.RandomUniqueId(),
+		Uuid:         uuid.NewString(),
+		HeadlineText: "Example Blog Post",
+		SummaryText:  "Just another example blog post for a unit test.",
+		User:         owner,
+		Tags:         &pb.Tags{Data: []string{"example", "test"}},
+		State: &pb.PostState{
+			Stage:       pb.PostState_S_PUB,
+			Status:      pb.PostState_S_VISIBLE,
+			RevisedAt:   nil,
+			ArchivedAt:  nil,
+			PublishedAt: timestamppb.Now(),
+			CreatedAt:   timestamppb.Now(),
+			Reacts:      &pb.Reacts{LikeCount: 13},
+		},
+	}
+
+	ustore := store.NewUserStore(store.SqlStore)
+	pstore := store.NewPostStore(store.SqlStore)
+
+	if err := ustore.NewUser(owner).Save(); err != nil {
+		t.Error(err)
+	}
+
+	defer ustore.NewUser(owner).Delete()
+
+	if err := pstore.NewPost(owner, post).Save(); err != nil {
+		t.Error(err)
+	}
+
+	defer pstore.NewPost(owner, post).Delete()
+
+	var (
+		expectedHeadlineText = "Just another post that was updated through a test."
+	)
+
+	updates := map[string]any{
+		"id":           float64(owner.Id),
+		"uuid":         post.Uuid,
+		"headlineText": expectedHeadlineText,
+	}
+
+	res := S.Exec(context.TODO(), q, "UserOpsForUpdatePost", map[string]any{
+		"post": updates,
+	})
+
+	if len(res.Errors) > 0 {
+		t.Errorf("%+v", res.Errors)
+	}
+
+	body := map[string]any{}
+
+	if err := json.Unmarshal(res.Data, &body); err != nil {
+		t.Fatal(err)
+	}
+
+	postUuid := body["userOps"].(map[string]any)["updatePost"].(map[string]any)["uuid"].(string)
+
+	upPost, err := pstore.GetByUuid(postUuid)
+	if err != nil {
+		t.Error(err)
+	}
+
+	if upPost.Proto().HeadlineText != expectedHeadlineText {
+		t.Error("did not match the expected headline text.")
+	}
+
 }
 
 func TestUserOpsDeletePost(t *testing.T) {

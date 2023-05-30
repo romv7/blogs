@@ -76,8 +76,9 @@ func NewAuthorHelper(u *pb.User, s storage.StorageDriverType) (out *AuthorHelper
 
 	// Create a default author.toml for the new author possible author.
 	if !out.storage.Contains(authorInfoFileKey) {
-
 		out.authorInfo = &AuthorInfo{
+			Bio:         "",
+			AltName:     "",
 			Stats:       &AuthorStats{},
 			SocialLinks: map[constants.SocialLinkType][]string{},
 		}
@@ -89,7 +90,6 @@ func NewAuthorHelper(u *pb.User, s storage.StorageDriverType) (out *AuthorHelper
 		if err := out.storage.Put(authorInfoFileKey, p.Bytes()); err != nil {
 			log.Panic(err)
 		}
-
 	} else {
 		out.authorInfo = &AuthorInfo{}
 
@@ -150,7 +150,7 @@ func (ah *AuthorHelper) SaveAuthorMetadata() {
 }
 
 func (ah *AuthorHelper) SaveAuthorPost(p *pb.Post) error {
-	if p.Uuid == "" || p.HeadlineText == "" || p.State == nil || p.User == nil {
+	if p.Uuid == "" || p.State == nil || p.User == nil {
 		log.Panic(ErrInvalidArgument)
 	}
 

@@ -99,17 +99,22 @@ func (s *UserStore) Save(u *User) (err error) {
 }
 
 func (s *UserStore) Delete(u *User) (err error) {
+	user := u.Proto()
+
 	switch s.t {
 	case SqlStore:
 		db := sqlStore.Store()
 
-		if res := db.Where("uuid = ?", u.sqlModel.Uuid).Delete(u.sqlModel); res != nil {
+		if res := db.Where("uuid = ?", user.Uuid).Delete(u.sqlModel); res.Error != nil {
 			return res.Error
 		}
-
-		u = nil
 	default:
 		log.Panic(ErrInvalidStore)
+	}
+
+	if user.Type == pb.User_T_AUTHOR {
+		ah := author.NewAuthorHelper(user, storage.Plain)
+		err = ah.DeleteAuthorMetadata()
 	}
 
 	return

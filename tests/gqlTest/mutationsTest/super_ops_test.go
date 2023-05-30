@@ -34,7 +34,7 @@ func TestSuperOpsAddUser(t *testing.T) {
 	var (
 		expectedName     = "romdevmod"
 		expectedFullName = "Rom Vales Villanueva"
-		expectedEmail    = "rom@gmail.com"
+		expectedEmail    = "romdevmod@gmail.com"
 	)
 
 	result := S.Exec(context.TODO(), query, "SuperOpsForAddUser", map[string]any{
@@ -192,19 +192,22 @@ func TestSuperOpsDeleteUser(t *testing.T) {
 		},
 	})
 
+	user := u.Proto()
+
 	if err := u.Save(); err != nil {
 		t.Error(err)
 	}
 
 	result := S.Exec(context.TODO(), query, "SuperOpsForDeleteUser", map[string]any{
-		"userUuid": u.Proto().Uuid,
+		"userUuid": user.Uuid,
 	})
 
 	if len(result.Errors) > 0 {
 		t.Errorf("%+v", result.Errors)
 	}
 
-	if u, err := ustore.GetByUuid(u.Proto().Uuid); u != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+	if u, err := ustore.GetByUuid(user.Uuid); u != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		t.Error("user was not deleted from the database..")
 	}
+
 }
